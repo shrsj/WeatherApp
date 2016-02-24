@@ -485,17 +485,6 @@
 
 - (IBAction)forecast:(UIButton *)sender
 {
-    ForecastViewController *sendDetails = [[ForecastViewController alloc] init];
-    NSArray *seperate = [full componentsSeparatedByString:@", "];
-    Area = seperate[0];
-    Country = seperate[1];
-    sendDetails.Area = Area;
-    sendDetails.Country = Country;
-    NSLog(@"%@%@",self.longitude,self.latitude);
-    NSString *lt = self.latitude;
-    NSString *ln = self.longitude;
-    sendDetails.longitude = lt;
-    sendDetails.latitude = ln;
 }
 
 - (IBAction)Share:(UIButton *)sender
@@ -523,6 +512,8 @@
     {
         sendDetails.Area = Area;
         sendDetails.Country = Country;
+        sendDetails.longitude = self.longitude;
+        sendDetails.latitude = self.latitude;
     }
 }
 -(void)senDetailsViewController:(FavouritesTableViewController *)controller didFinishEnteringItem:(NSDictionary *)item
@@ -556,7 +547,17 @@
 @end
 
 
-
+/*
+ ForecastViewController *sendDetails = [[ForecastViewController alloc] init];
+ NSArray *seperate = [full componentsSeparatedByString:@", "];
+ Area = seperate[0];
+ Country = seperate[1];
+ sendDetails.Area = Area;
+ sendDetails.Country = Country;
+ NSLog(@"%@%@",self.longitude,self.latitude);
+ 
+ sendDetails.longitude = lt;
+ sendDetails.latitude = ln;*/
 /* if([NSThread isMainThread])
  {
  NSLog(@"Running on main Thread");

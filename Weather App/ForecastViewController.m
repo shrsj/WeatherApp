@@ -70,7 +70,7 @@
     [self.activityIndicator startAnimating];
     [self.view addSubview:self.activityIndicator];
     NSURLSession *session = [NSURLSession sharedSession];
-    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/forecast10day/q/%@/%@.json",latitude,longitude];
+    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/forecast10day/q/%@,%@.json",latitude,longitude];
     NSString* encodedUrl = [ApiCall stringByAddingPercentEscapesUsingEncoding:
                             NSUTF8StringEncoding];
     NSURLSessionDataTask *dataTask = [session dataTaskWithURL:[NSURL URLWithString:encodedUrl] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
