@@ -63,9 +63,15 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    if (isFiltered == YES)
+    {
+        return 1;
+    }
+    else
+    {
+        return 2;
+    }
 }
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(isFiltered == YES)
@@ -75,8 +81,14 @@
     }
     else
     {
-        NSInteger count =[favLocations count];
-        return count;
+        if (section == 0)
+        {
+            NSInteger count =[favLocations count];
+            return count;
+        }
+        else{
+            return 1;
+        }
     }
 }
 
@@ -109,28 +121,68 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-    if (isFiltered == YES)
+    if ([indexPath section] == 0)
     {
-        cell.textLabel.text = [searchList[indexPath.row] valueForKey:@"name"];
+        static NSString *CellIdentifier = @"Cell";
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        if (isFiltered == YES)
+        {
+            cell.textLabel.text = [searchList[indexPath.row] valueForKey:@"name"];
+        }
+        else
+        {
+            if (!(favLocations == 0))
+            {
+                //cell.textLabel.text = [favLocations[indexPath.row] valueForKey:@"name"];
+                NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
+                NSLog(@"%@ ",[device valueForKey:@"placeName"]);
+                UILabel *name = (UILabel *)[cell viewWithTag:1];
+                name.text = [device valueForKey:@"placeName"];
+                UILabel *ll = (UILabel *)[cell viewWithTag:2];
+                ll.text = [NSString stringWithFormat:@"%@ , %@",[device valueForKey:@"latitude"],[device valueForKey:@"longitude"]];
+            }
+        }
+        return cell;
     }
     else
     {
-        if (!(favLocations == 0))
-        {
-            //cell.textLabel.text = [favLocations[indexPath.row] valueForKey:@"name"];
-            NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-            NSLog(@"%@ ",[device valueForKey:@"placeName"]);
-            UILabel *name = (UILabel *)[cell viewWithTag:1];
-            name.text = [device valueForKey:@"placeName"];
-            UILabel *ll = (UILabel *)[cell viewWithTag:2];
-            ll.text = [NSString stringWithFormat:@"%@ , %@",[device valueForKey:@"latitude"],[device valueForKey:@"longitude"]];
-        }
+        static NSString *CellIdentifier = @"settingsCell";
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        
+        /* UIButton *setCelcius = (UIButton *)[cell viewWithTag:11];
+         setCelcius.titleLabel.text = @"℃";
+         [setCelcius setFrame:CGRectMake(60, 10, 15, 15)];
+         [setCelcius addTarget:self action:@selector(setUnitC) forControlEvents:UIControlEventTouchUpInside];
+         
+         UILabel *label1 =(UILabel *)[cell viewWithTag:12];
+         
+         label1.frame = CGRectMake(75, 10, 3,15 );
+         label1.text = @"/";
+         
+         UIButton *setFaren = (UIButton *)[cell viewWithTag:22];
+         setFaren.titleLabel.text = @"℉";
+         [setFaren setFrame:CGRectMake(75, 10, 15, 15)];
+         [setFaren addTarget:self action:@selector(setUnitF) forControlEvents:UIControlEventTouchUpInside];*/
+        return cell;
     }
-    return cell;
+}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return @"Favourite Locations";
+    }
+    else
+    {
+        return @"Settings";
+    }
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -142,9 +194,14 @@
         NSString *places =[searchList[indexPath.row] valueForKey:@"name"];
         if (![favLocations containsObject:places])
         {
-            [place setValue:places forKey:@"placeName"];
-            [place setValue:[searchList[indexPath.row] valueForKey:@"lat"] forKey:@"latitude"];
-            [place setValue:[searchList[indexPath.row] valueForKey:@"lon"] forKey:@"longitude"];
+            NSString *lati = [searchList[indexPath.row] valueForKey:@"lat"];
+            NSString *longi = [searchList[indexPath.row] valueForKey:@"lon"];
+            if (places != NULL && lati != NULL && longi != NULL)
+            {
+                [place setValue:places forKey:@"placeName"];
+                [place setValue:lati forKey:@"latitude"];
+                [place setValue:longi forKey:@"longitude"];
+            }
             NSError *error = nil;
             // Save the object to persistent store
             if (![context save:&error]) {
@@ -176,6 +233,18 @@
         [self.navigationController popToRootViewControllerAnimated:YES];
         [self.delegate senDetailsViewController:self didFinishEnteringItem:send];
     }
+}
+
+
+-(void)setUnitC
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:YES forKey:@"metric"];
+}
+-(void)setUnitF
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:NO forKey:@"metric"];
 }
 
 #pragma mark - SearchBar Delegate Methods.

@@ -9,32 +9,35 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import "FavouritesTableViewController.h"
+#import <Reachability.h>
 
 @interface ViewController : UIViewController <CLLocationManagerDelegate,FavouritesTableViewControllerDelegate>
+
 
 @property (weak, nonatomic) IBOutlet UIImageView *weatherIcon;
 @property (weak, nonatomic) IBOutlet UILabel *Place;
 @property (weak, nonatomic) IBOutlet UILabel *Temperature;
-@property (weak, nonatomic) IBOutlet UILabel *unit;
 @property (weak, nonatomic) IBOutlet UILabel *weatherText;
 @property (weak, nonatomic) IBOutlet UITextView *Info;
 @property (weak, nonatomic) IBOutlet UILabel *summary;
 
+//passing data for location
 @property (strong,nonatomic) NSString *longitude;
 @property (strong,nonatomic) NSString *latitude;
 @property (strong,nonatomic) NSString *locationName;
 @property BOOL setLocation;
 
-
-
-
+//images
+@property (nonatomic, strong) UIImageView *backgroundImageView;
+@property (nonatomic, strong) UIImageView *blurredImageView;
+@property (nonatomic, assign) CGFloat screenHeight;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activIndicator;
 @property (weak, nonatomic) IBOutlet UIScrollView *scroll;
 
 
 - (IBAction)forecast:(UIButton *)sender;
 - (IBAction)Share:(UIButton *)sender;
-- (IBAction)history:(UIButton *)sender;
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activIndicator;
+
 
 - (IBAction)favbutton:(id)sender;
 

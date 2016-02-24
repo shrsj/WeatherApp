@@ -39,6 +39,8 @@
     NSInteger *minTemp;
     NSString *sumary;
     
+    //response from Core Data
+    NSMutableArray *cd_array;
     
     //Hourly
     NSArray *hourlyForecast;
@@ -55,7 +57,17 @@
     NSString *errorMsg;
     NSString *errorType;
     
+    //get from Core Data
+    NSMutableArray *presentConditions;
+    NSMutableArray *allLocations;
+    NSMutableArray *place;
+    NSMutableArray *lats;
+    NSMutableArray *longs;
+    NSString *visited;
     BOOL Metric;
+    
+    UIColor *fontColor;
+    UIImage *background;
 }
 
 @end
@@ -69,26 +81,32 @@
     locationManager = [CLLocationManager new];
     locationManager.delegate = self;
     locationManager.distanceFilter = kCLDistanceFilterNone;
-    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [locationManager requestAlwaysAuthorization];
     
     FavouritesTableViewController *faVC = [[FavouritesTableViewController alloc] init];
     faVC.delegate = self;
+    fontColor = [UIColor whiteColor];
+    self.screenHeight = [UIScreen mainScreen].bounds.size.height;
     
-    [locationManager requestAlwaysAuthorization];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH.mm"];
+    NSString *strCurrentTime = [dateFormatter stringFromDate:[NSDate date]];
     
-    if (self.setLocation)
+    NSLog(@"Check float value: %.2f",[strCurrentTime floatValue]);
+    if ([strCurrentTime floatValue] >= 18.00 || [strCurrentTime floatValue]  <= 6.00)
     {
-        [self weatherDetails:self.latitude longitude:self.longitude];
+        NSLog(@"It's night time");
+        background = [UIImage imageNamed:@"znight"];
+    }else{
+        NSLog(@"It's day time");
+        background = [UIImage imageNamed:@"znight"];
     }
-    else
-    {
-        [locationManager startUpdatingLocation];
-    }
-    self.activIndicator.center = self.view.center;
-    [self.view addSubview:self.activIndicator];
-    [self.activIndicator startAnimating];
+    
+    [self.view setBackgroundColor:[UIColor colorWithPatternImage:background]];
+    
+    
+    [self getAllLocations];
 }
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -97,21 +115,56 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    Metric = [defaults boolForKey:@"metric"];
+    Reachability *reach = [Reachability reachabilityWithHostName:@"www.google.com"];
+    NSInteger x = [reach currentReachabilityStatus];
+    self.activIndicator.center = self.view.center;
+    [self.view addSubview:self.activIndicator];
+    [self.activIndicator startAnimating];
+    
     if (self.setLocation)
     {
-        [self weatherDetails:self.latitude longitude:self.longitude];
+        if (x > 0)
+        {
+            [self weatherDetails:self.latitude longitude:self.longitude];
+        }
+        else
+        {
+            [self getData];
+            [self UpdateFromDB];
+            [self updateInfo];
+            errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
+            [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
+        }
+        [reach startNotifier];
     }
     else
     {
-        [locationManager startUpdatingLocation];
+        if (x > 0)
+        {
+            [locationManager startUpdatingLocation];
+        }
+        else
+        {
+            errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
+            //[self displayAlert];
+            //load the first location in the array
+            self.locationName = [defaults objectForKey:@"location"];
+            [self getData];
+            [self UpdateFromDB];
+            [self updateInfo];
+        }
+        [reach startNotifier];
     }
 }
 
 #pragma mark Weather Forecast
-
+//when network is present this function is called
 -(void)weatherDetails:(NSString *)lat
             longitude:(NSString *)longi
 {
+    [locationManager stopUpdatingLocation];
     //[self.activIndicator startAnimating];
     NSURLSession *session = [NSURLSession sharedSession];
     NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/hourly/forecast/conditions/q/%@,%@.json",lat,longi];
@@ -138,18 +191,16 @@
             // Display Current Temperatures
             weatherType = [conditions objectForKey:@"icon"];
             humidity = [conditions objectForKey:@"relative_humidity"];
-            icon = [conditions objectForKey:@"icon_url"];
             windString = [conditions objectForKey:@"wind_string"];
             precipitation_string = [conditions objectForKey:@"precip_today_string"];
             visibilityString = [NSString stringWithFormat:@"is upto %@ Kms / %@ Miles.",[conditions objectForKey:@"visibility_km"],[conditions objectForKey:@"visibility_mi"]];
             
-            currentTemp_f = [conditions objectForKey:@"temp_f"];
-            currentTemp_c = [conditions objectForKey:@"temp_c"];
-            feels_f = [conditions objectForKey:@"feelslike_f"];
-            feels_c = [conditions objectForKey:@"feelslike_c"];
-            heatIndex_f = [conditions objectForKey:@"heat_index_f"];
-            heatIndex_c = [conditions objectForKey:@"heat_index_c"];
-            
+            currentTemp_f = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"temp_f"]];
+            currentTemp_c = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"temp_c"]];
+            feels_f = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"feelslike_f"]];
+            feels_c = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"feelslike_c"]];
+            heatIndex_f = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"heat_index_f"]];
+            heatIndex_c = [NSString stringWithFormat:@"%@",[conditions objectForKey:@"heat_index_c"]];
             
             //Forecast
             forecastDict = [json objectForKey:@"forecast"];
@@ -157,13 +208,12 @@
             NSArray *forecastday = [txtForecast objectForKey:@"forecastday"];
             sumary = [forecastday[0] valueForKey:@"fcttext_metric"];
             
-            //NSDictionary *simpleForecast = [forecastDict objectForKey:@"simpleforecast"];
-            //NSArray *sForecastday = [txtForecast objectForKey:@"forecastday"];
-            
             //hourly
             hourlyForecast = [json objectForKey:@"hourly_forecast"];
             
             [self performSelectorOnMainThread:@selector(updateInfo) withObject:NULL waitUntilDone:NO];
+            [self performSelectorOnMainThread:@selector(createScroll) withObject:NULL waitUntilDone:NO];
+            [self UpdateData];
         }
         else
         {
@@ -174,30 +224,32 @@
 }
 #pragma mark View Update Methods
 
--(void)createScroll :(NSArray *)forecast
+-(void)createScroll
 {
     ////scroll properties
     
     NSInteger hours = 24,width = 0;
     float labelwidth = 100.0f;
     self.scroll.contentSize = CGSizeMake((labelwidth * hours), 100);
+    self.scroll.backgroundColor = [UIColor clearColor];
     UIView *hourlyScroll = [[UIView alloc] initWithFrame:CGRectMake(0, 0, (labelwidth*hours), 80)];
     hourlyScroll.backgroundColor = [UIColor clearColor];
     
     for(int i = 0; i < hours; i++)
     {
-        NSArray *timings = [forecast[i] valueForKey:@"FCTTIME"];
+        NSArray *timings = [hourlyForecast[i] valueForKey:@"FCTTIME"];
         
         //time label
         UILabel *time =  [[UILabel alloc] initWithFrame: CGRectMake(width,0,labelwidth,14)];
         time.textAlignment = NSTextAlignmentCenter;
-        time.adjustsFontSizeToFitWidth = YES;
-        time.text = [NSString stringWithFormat:@"%@",[timings valueForKey:@"civil"]]; //etc...
-        [time sizeToFit]; // resize the width and height to fit the text
+        time.textColor = fontColor;
+        [time setFont:[UIFont systemFontOfSize:10]];
         time.backgroundColor = [UIColor clearColor];
         
+        time.text = [NSString stringWithFormat:@"%@",[timings valueForKey:@"civil"]]; //etc...
+        
         //image icons
-        NSString *imageN = [NSString stringWithFormat:@"%@",[forecast[i] valueForKey:@"icon"]];
+        NSString *imageN = [NSString stringWithFormat:@"%@",[hourlyForecast[i] valueForKey:@"icon"]];
         UIImage *myShot = [UIImage imageNamed:imageN];
         UIImageView *myImageView = [[UIImageView alloc] initWithImage:myShot];
         CGRect myFrame = CGRectMake(width , 16.0f, labelwidth,40);
@@ -206,12 +258,13 @@
         //If your image is bigger than the frame then you can scale it
         [myImageView setContentMode:UIViewContentModeScaleAspectFit];
         
-        
         //max min
         UILabel *labelMaxMin =  [[UILabel alloc] initWithFrame: CGRectMake(width,56,labelwidth,14)];
         labelMaxMin.adjustsFontSizeToFitWidth = YES;
+        labelMaxMin.textColor = fontColor;
         labelMaxMin.textAlignment = NSTextAlignmentCenter;
-        NSDictionary *temp = [forecast[i] valueForKey:@"temp"];
+        [labelMaxMin setFont:[UIFont systemFontOfSize:10]];
+        NSDictionary *temp = [hourlyForecast[i] valueForKey:@"temp"];
         NSString *temp_c = [temp valueForKey:@"metric"];
         NSString *temp_f = [temp valueForKey:@"english"];
         
@@ -225,11 +278,9 @@
             NSString *tempt = temp_f;
             labelMaxMin.text = [NSString stringWithFormat:@" %@ ℉",tempt]; //etc...[forecast[i] valueForKey:@"condition"],
         }
-        
         labelMaxMin.backgroundColor = [UIColor clearColor];
-        
-        
         width+=labelwidth;
+        
         [hourlyScroll addSubview:time];
         [hourlyScroll addSubview:myImageView];
         [hourlyScroll addSubview:labelMaxMin];
@@ -243,14 +294,15 @@
     [self.activIndicator stopAnimating];
     [self.activIndicator removeFromSuperview];
     self.Place.text = full;
+    self.locationName = full;
     if (Metric)
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_c];
+        self.Temperature.text = [NSString stringWithFormat:@"%@ ℃",currentTemp_c];
         self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@\nHeat Index : %@\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
     }
     else
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_f];
+        self.Temperature.text = [NSString stringWithFormat:@"%@ ℉",currentTemp_f];
         self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@\nHeat Index : %@\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
     }
     self.weatherText.text = weatherType;
@@ -258,16 +310,39 @@
     
     self.weatherIcon.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",weatherType]];
     self.summary.text = sumary;
-    [self createScroll:hourlyForecast];
+    
+    [self saveAppdetails];
+    
+}
+//When network doesnt exit it updates from db
+-(void)UpdateFromDB
+{
+    NSManagedObject *show = [presentConditions objectAtIndex:0];
+    full = [show valueForKey:@"place"];
+    
+    // Display Current Temperatures
+    weatherType = [show valueForKey:@"weather"];
+    humidity = [show valueForKey:@"humidity"];
+    windString = [show valueForKey:@"wind"];
+    precipitation_string = [show valueForKey:@"precip"];
+    visibilityString = [show valueForKey:@"visibility"];
+    
+    currentTemp_f = [show valueForKey:@"tempf"];
+    currentTemp_c = [show valueForKey:@"tempc"];
+    feels_f = [show valueForKey:@"feelsf"];
+    feels_c = [show valueForKey:@"feelsc"];
+    heatIndex_f = [show valueForKey:@"heatf"];
+    heatIndex_c = [show valueForKey:@"heatc"];
+    sumary = [show valueForKey:@"summary"];
 }
 
 #pragma mark CLLocationManger Delegate method
 
+
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     CLLocation *currentLocation = [locations lastObject];
-    [locationManager stopUpdatingLocation];
-    NSLog(@"%f",currentLocation.coordinate.latitude);
+    NSLog(@"longi is %f",currentLocation.coordinate.latitude);
     NSLog(@"%f",currentLocation.coordinate.longitude);
     
     CLGeocoder *geocoder = [[CLGeocoder alloc] init] ;
@@ -280,6 +355,8 @@
              Country = [[NSString alloc]initWithString:placemark.country];
              NSString *lt = [NSString stringWithFormat:@"%f",currentLocation.coordinate.latitude];
              NSString *lng = [NSString stringWithFormat:@"%f",currentLocation.coordinate.longitude];
+             self.latitude = lt;
+             self.longitude = lng;
              [self weatherDetails:lt longitude:lng];
          }
          else
@@ -289,15 +366,95 @@
              return;
          }
      }];
+    [locationManager stopUpdatingLocation];
 }
 
 
-- (IBAction)favbutton:(id)sender
+#pragma mark Core data functions
+
+- (NSManagedObjectContext *)managedObjectContext {
+    NSManagedObjectContext *context = nil;
+    id delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate performSelector:@selector(managedObjectContext)]) {
+        context = [delegate managedObjectContext];
+    }
+    return context;
+}
+
+-(void)getAllLocations
 {
-    FavouritesTableViewController *faVC = [[FavouritesTableViewController alloc] init];
-    faVC.delegate = self;
-    [[self navigationController] pushViewController:faVC animated:YES];
+    NSManagedObjectContext *managedObjContext = [self managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Place"];
+    allLocations = [[managedObjContext executeFetchRequest:request error:nil] mutableCopy];
+    
+    NSUInteger count = 0;
+    for (NSManagedObject *location in allLocations)
+    {
+        [place setObject:[location valueForKey:@"placeName"] atIndexedSubscript:count];
+        [lats setObject:[location valueForKey:@"latitude"] atIndexedSubscript:count];
+        [longs setObject:[location valueForKey:@"longitude"] atIndexedSubscript:count];
+        count = count +1;
+    }
 }
+
+-(void)UpdateData
+{
+    //deletes data since we have updated info
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSFetchRequest *all = [[NSFetchRequest alloc] init];
+    [all setEntity:[NSEntityDescription entityForName:@"PresentConditions" inManagedObjectContext:context]];
+    [all setIncludesPropertyValues:NO]; //only fetch the managedObjectID
+    
+    NSError *error = nil;
+    NSArray *data = [context executeFetchRequest:all error:&error];
+    //error handling goes here
+    for (NSManagedObject *conditn in data) {
+        [context deleteObject:conditn];
+    }
+    if ([context save:&error] == NO) {
+        NSAssert(NO, @"Save should not fail\n%@", [error localizedDescription]);
+        abort();
+    }
+    [presentConditions removeObjectAtIndex:0];
+    
+    //Insert new updated info
+    NSDate *date = [NSDate date];
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"EEEE, dd : MMMM : yyyy"];
+    date = [dateFormat dateFromString:[dateFormat stringFromDate:[NSDate date]]];
+    NSManagedObjectModel *condition = [NSEntityDescription insertNewObjectForEntityForName:@"PresentConditions" inManagedObjectContext:context];
+    [condition setValue:date forKey:@"day"];
+    [condition setValue:feels_f forKey:@"feelsf"];
+    [condition setValue:feels_c forKey:@"feelsc"];
+    [condition setValue:heatIndex_c forKey:@"heatc"];
+    [condition setValue:heatIndex_f forKey:@"heatf"];
+    [condition setValue:humidity forKey:@"humidity"];
+    [condition setValue:full forKey:@"place"];
+    [condition setValue:precipitation_string forKey:@"precip"];
+    [condition setValue:sumary forKey:@"summary"];
+    [condition setValue:currentTemp_f forKey:@"tempf"];
+    [condition setValue:currentTemp_c forKey:@"tempc"];
+    [condition setValue:visibilityString forKey:@"visibility"];
+    [condition setValue:weatherType forKey:@"weather"];
+    [condition setValue:windString forKey:@"wind"];
+    
+    error = nil;
+    // Save the object to persistent store
+    if (![context save:&error])
+    {
+        NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+    }
+}
+
+-(void)getData
+{
+    NSManagedObjectContext *managedObjContext = [self managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"PresentConditions"];
+    [request setPredicate:[NSPredicate predicateWithFormat:@"place == %@",self.locationName]];
+    presentConditions = [[managedObjContext executeFetchRequest:request error:nil] mutableCopy];
+}
+
+#pragma mark button actions
 
 -(void) displayAlert
 {
@@ -307,7 +464,6 @@
                                   alertControllerWithTitle:@"RSS Feeds"
                                   message:fullMessage
                                   preferredStyle:UIAlertControllerStyleAlert];
-    
     UIAlertAction* ok = [UIAlertAction
                          actionWithTitle:@"OK"
                          style:UIAlertActionStyleDefault
@@ -316,11 +472,15 @@
                              [alert dismissViewControllerAnimated:YES completion:nil];
                              
                          }];
-    
     [alert addAction:ok];
-    
-    
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (IBAction)favbutton:(id)sender
+{
+    FavouritesTableViewController *faVC = [[FavouritesTableViewController alloc] init];
+    faVC.delegate = self;
+    [[self navigationController] pushViewController:faVC animated:YES];
 }
 
 - (IBAction)forecast:(UIButton *)sender
@@ -331,7 +491,11 @@
     Country = seperate[1];
     sendDetails.Area = Area;
     sendDetails.Country = Country;
-    
+    NSLog(@"%@%@",self.longitude,self.latitude);
+    NSString *lt = self.latitude;
+    NSString *ln = self.longitude;
+    sendDetails.longitude = lt;
+    sendDetails.latitude = ln;
 }
 
 - (IBAction)Share:(UIButton *)sender
@@ -350,7 +514,6 @@
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Oops" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alertView show];
     }
-    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -362,17 +525,32 @@
         sendDetails.Country = Country;
     }
 }
-
-
-- (IBAction)history:(UIButton *)sender {
-}
-
 -(void)senDetailsViewController:(FavouritesTableViewController *)controller didFinishEnteringItem:(NSDictionary *)item
 {
     self.latitude = [item valueForKey:@"lat"];
     self.longitude = [item valueForKey:@"long"];
     self.locationName = [item valueForKey:@"name"];
     self.setLocation = YES;
+}
+
+#pragma mark UserDefaults
+
+-(void)saveAppdetails
+{
+    // Store the data
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"dd MM YYYY"];
+    visited = [format stringFromDate:[NSDate date]];
+    
+    [defaults setObject:self.locationName forKey:@"location"];
+    [defaults setObject:self.latitude forKey:@"latitude"];
+    [defaults setObject:self.longitude forKey:@"longitude"];
+    [defaults setObject:visited forKey:@"lastVisited"];
+    
+    [defaults synchronize];
+    
+    NSLog(@"Data saved");
 }
 
 @end

@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "weather-rain.png",
+      "filename" : "winter-sun.jpg",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "weather-rain@2x.png",
+      "filename" : "winter-sun-1.jpg",
       "scale" : "2x"
     },
     {

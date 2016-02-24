@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F27" minimumToolsVersion="Automatic">
+    <entity name="Forecast" syncable="YES">
+        <attribute name="condition" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="day" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="humidity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="icon" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="location" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="maxc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="maxf" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="minc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="minf" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Place" syncable="YES">
         <attribute name="latitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="placeName" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <entity name="PresentConditions" syncable="YES">
+        <attribute name="day" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="feelsc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="feelsf" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="heatc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="heatf" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="humidity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="place" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="precip" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tempc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tempf" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="visibility" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="weather" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="wind" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <elements>
+        <element name="Forecast" positionX="-45" positionY="27" width="128" height="180"/>
         <element name="Place" positionX="-54" positionY="-9" width="128" height="90"/>
+        <element name="PresentConditions" positionX="-27" positionY="99" width="128" height="255"/>
     </elements>
 </model>

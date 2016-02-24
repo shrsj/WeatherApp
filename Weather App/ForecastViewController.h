@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreData/CoreData.h>
+#import <Reachability.h>
 
 @interface ForecastViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
 
@@ -16,5 +18,7 @@
 
 @property NSString *Area;
 @property NSString *Country;
+@property NSString *latitude;
+@property NSString *longitude;
 
 @end
