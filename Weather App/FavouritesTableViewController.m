@@ -41,6 +41,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)viewDidDisappear:(BOOL)animated
+{
+    
+}
+
 #pragma mark Coredata methods
 
 - (NSManagedObjectContext *)managedObjectContext {
@@ -153,20 +158,6 @@
         if (cell == nil)
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
         
-        /* UIButton *setCelcius = (UIButton *)[cell viewWithTag:11];
-         setCelcius.titleLabel.text = @"℃";
-         [setCelcius setFrame:CGRectMake(60, 10, 15, 15)];
-         [setCelcius addTarget:self action:@selector(setUnitC) forControlEvents:UIControlEventTouchUpInside];
-         
-         UILabel *label1 =(UILabel *)[cell viewWithTag:12];
-         
-         label1.frame = CGRectMake(75, 10, 3,15 );
-         label1.text = @"/";
-         
-         UIButton *setFaren = (UIButton *)[cell viewWithTag:22];
-         setFaren.titleLabel.text = @"℉";
-         [setFaren setFrame:CGRectMake(75, 10, 15, 15)];
-         [setFaren addTarget:self action:@selector(setUnitF) forControlEvents:UIControlEventTouchUpInside];*/
         return cell;
     }
 }
@@ -187,10 +178,10 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSManagedObjectModel *place = [NSEntityDescription insertNewObjectForEntityForName:@"Place" inManagedObjectContext:context];
     if (isFiltered == YES)
     {
+        NSManagedObjectContext *context = [self managedObjectContext];
+        NSManagedObjectModel *place = [NSEntityDescription insertNewObjectForEntityForName:@"Place" inManagedObjectContext:context];
         NSString *places =[searchList[indexPath.row] valueForKey:@"name"];
         if (![favLocations containsObject:places])
         {
@@ -221,30 +212,10 @@
     else if (isFiltered == NO)
     {
         NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-        NSMutableDictionary *send = [[NSMutableDictionary alloc] init];
-        [send setObject:[device valueForKey:@"latitude"] forKey:@"lat"];
-        [send setObject:[device valueForKey:@"longitude"] forKey:@"long"];
-        [send setObject:[device valueForKey:@"placeName"] forKey:@"name"];
-        ViewController *vc = [[ViewController alloc] init];
-        vc.latitude = [device valueForKey:@"latitude"];
-        vc.longitude = [device valueForKey:@"latitude"];
-        vc.setLocation = YES;
-        
-        [self.navigationController popToRootViewControllerAnimated:YES];
-        [self.delegate senDetailsViewController:self didFinishEnteringItem:send];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:[device valueForKey:@"placeName"] forKey:@"favSet"];
+        [[self navigationController] popToRootViewControllerAnimated:YES];
     }
-}
-
-
--(void)setUnitC
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:YES forKey:@"metric"];
-}
--(void)setUnitF
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:NO forKey:@"metric"];
 }
 
 #pragma mark - SearchBar Delegate Methods.
@@ -291,6 +262,16 @@
         [self.tableView reloadData];
     });
 }
+- (IBAction)setToCelcius:(UIButton *)sender {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:YES forKey:@"metric"];
+}
+
+- (IBAction)setToFarenheit:(UIButton *)sender {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:NO forKey:@"metric"];
+}
+@end
 
 // Delete the row from the data source
 //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -345,6 +326,29 @@
  // Get the new view controller using [segue destinationViewController].
  // Pass the selected object to the new view controller.
  }
+ 
+ 
+ #import <UIKit/UIKit.h>
+ #import <CoreData/CoreData.h>
+ 
+ 
+ @class ViewController;
+ @class FavouritesTableViewController;
+ 
+ @protocol FavouritesTableViewControllerDelegate<NSObject>
+ 
+ - (void)senDetailsViewController:(FavouritesTableViewController *)controller didFinishEnteringItem:(NSDictionary *)item;
+ 
+ @end
+ 
+ @interface FavouritesTableViewController : UITableViewController <UISearchControllerDelegate,UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
+ 
+ @property (strong, nonatomic) IBOutlet UISearchController *search;
+ @property (nonatomic, weak) id <FavouritesTableViewControllerDelegate> delegate;
+ 
+ @end
+ 
+ 
+ 
  */
 
-@end

@@ -11,7 +11,7 @@
 #import "FavouritesTableViewController.h"
 #import <Reachability.h>
 
-@interface ViewController : UIViewController <CLLocationManagerDelegate,FavouritesTableViewControllerDelegate>
+@interface ViewController : UIViewController <CLLocationManagerDelegate>
 
 
 @property (weak, nonatomic) IBOutlet UIImageView *weatherIcon;
@@ -20,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *weatherText;
 @property (weak, nonatomic) IBOutlet UITextView *Info;
 @property (weak, nonatomic) IBOutlet UILabel *summary;
+@property (weak, nonatomic) IBOutlet UILabel *tempUnit;
 
 //passing data for location
 @property (strong,nonatomic) NSString *longitude;

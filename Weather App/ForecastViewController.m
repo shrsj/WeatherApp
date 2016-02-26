@@ -21,6 +21,7 @@
     NSInteger count;
     
     NSString *locationName;
+    NSDate *lastVisited;
     
     BOOL metric;
     BOOL reachable;
@@ -37,9 +38,21 @@
     self.table.dataSource = self;
     self.place.text = [NSString stringWithFormat:@"%@, %@",self.Area,self.Country];
     locationName = [NSString stringWithFormat:@"%@, %@",self.Area,self.Country];
+    self.icon.image = [UIImage imageNamed:self.weatherType];
+    self.weatherLabel.text = self.weatherType;
+    if (metric) {
+        self.tempLabel.text= self.tempc;
+    }
+    else{
+        self.tempLabel.text = self.tempf;
+    }
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     metric = [defaults boolForKey:@"metric"];
+    NSString *dated = [defaults objectForKey:@"lastVisited"];
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"dd MM yyyy ZZZZ"];
+    lastVisited = [format dateFromString:dated];
     Reachability *reach = [Reachability reachabilityWithHostName:@"www.google.com"];
     NSInteger x = [reach currentReachabilityStatus];
     if (x > 0)
@@ -53,7 +66,7 @@
     {
         reachable = NO;
         [self getData];
-        errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
+        errorMsg = @"Because of unavailability of Network \nRealtime Information May Not be available.";
         [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
     }
     [reach startNotifier];
@@ -82,8 +95,12 @@
             simpleForecast = [temp objectForKey:@"forecastday"];
             details = [simpleForecast valueForKey:@"date"];
             count = [simpleForecast count];
-            [self UpdateData];
+            long diff = [self daysBetween:lastVisited and:[NSDate date]];
             
+            if (diff > 1 )
+            {
+                [self UpdateData];
+            }
             [self.table performSelectorOnMainThread:@selector(reloadData) withObject:Nil waitUntilDone:NO];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.activityIndicator stopAnimating];
@@ -149,7 +166,6 @@
         NSString *averghum = [NSString stringWithFormat:@"%@",[simpleForecast[i] valueForKey:@"avehumidity"]];
         NSString *icon = [simpleForecast[i] valueForKey:@"icon"];
         NSString *conditions = [simpleForecast[i] valueForKey:@"conditions"];
-        
         
         NSManagedObjectModel *condition = [NSEntityDescription insertNewObjectForEntityForName:@"Forecast" inManagedObjectContext:context];
         
@@ -228,7 +244,6 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
-    
     UILabel *Day = (UILabel *)[cell viewWithTag:101];
     UILabel *Conditions = (UILabel *)[cell viewWithTag:102];
     UIImageView *icon = (UIImageView *)[cell viewWithTag:103];
@@ -275,17 +290,56 @@
         temp.text = [NSString stringWithFormat:@"Max %@, Min %@",high,low];
         icon.image = [UIImage imageNamed:imageN];
     }
-    
-    /*CGRect myFrame = CGRectMake(250, 6, 70, 60);
-     [icon setFrame:myFrame];
-     [cell addSubview:Day];
-     [cell addSubview:Conditions];
-     [cell addSubview:temp];
-     [cell addSubview:icon];*/
     return cell;
 }
+/*
+ - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+ {
+ UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 28)];
+ /* Create custom view to display section header... 
+ UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",self.weatherType]];
+ 
+ UIImageView *icon = [[UIImageView alloc] init];
+ icon.frame = CGRectMake(8, 2, 10, 10);
+ [icon setImage:image];
+ 
+ UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(12, 2, 15, 12)];
+ [label setFont:[UIFont boldSystemFontOfSize:14]];
+ label.text = self.weatherType;
+ 
+ UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(22, 14, 15, 10)];
+ [label1 setFont:[UIFont boldSystemFontOfSize:10]];
+ if (metric) {
+ label.text = self.tempf;
+ }
+ else
+ {
+ label1.text = self.tempc;
+ }
+ 
+ 
+ 
+ [view addSubview:label];
+ [view setBackgroundColor:[UIColor colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
+ return view;
+ 
+ 
+ }
+ */
 
 
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    self.icon.hidden = NO;
+    self.tempLabel.hidden = NO;
+    self.weatherLabel.hidden = NO;
+}
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    self.icon.hidden = YES;
+    self.tempLabel.hidden = YES;
+    self.weatherLabel.hidden = YES;
+}
 -(void) displayAlert
 {
     NSString *msg = @"Oops....";
@@ -305,19 +359,12 @@
                          }];
     
     [alert addAction:ok];
-    
-    
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
-
+- (long)daysBetween:(NSDate *)dt1 and:(NSDate *)dt2 {
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:dt1 toDate:dt2 options:0];
+    return [components day]+1;
+}
 @end

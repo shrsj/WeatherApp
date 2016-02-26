@@ -10,7 +10,7 @@
 #import "ForecastViewController.h"
 #import <Social/Social.h>
 
-@interface ViewController () <FavouritesTableViewControllerDelegate>
+@interface ViewController () 
 {
     CLLocationManager *locationManager;
     NSMutableData *responseData;
@@ -64,7 +64,10 @@
     NSMutableArray *lats;
     NSMutableArray *longs;
     NSString *visited;
+    NSDate *lastVisited;
+    
     BOOL Metric;
+    BOOL infoUpdated;
     
     UIColor *fontColor;
     UIImage *background;
@@ -83,8 +86,6 @@
     locationManager.distanceFilter = kCLDistanceFilterNone;
     [locationManager requestAlwaysAuthorization];
     
-    FavouritesTableViewController *faVC = [[FavouritesTableViewController alloc] init];
-    faVC.delegate = self;
     fontColor = [UIColor whiteColor];
     self.screenHeight = [UIScreen mainScreen].bounds.size.height;
     
@@ -101,10 +102,6 @@
         NSLog(@"It's day time");
         background = [UIImage imageNamed:@"znight"];
     }
-    
-    [self.view setBackgroundColor:[UIColor colorWithPatternImage:background]];
-    
-    
     [self getAllLocations];
 }
 
@@ -116,7 +113,25 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *check = [defaults objectForKey:@"favSet"];
+    
+    if ([check isEqualToString:@"clear"]) {
+        self.setLocation = NO;
+        infoUpdated = NO;
+    }
+    else
+    {
+        self.setLocation = YES;
+        self.locationName = check;
+    }
+    
     Metric = [defaults boolForKey:@"metric"];
+    infoUpdated = NO;
+    NSString *dated = [defaults objectForKey:@"lastVisited"];
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"dd MM yyyy ZZZZ"];
+    lastVisited = [format dateFromString:dated];
+    
     Reachability *reach = [Reachability reachabilityWithHostName:@"www.google.com"];
     NSInteger x = [reach currentReachabilityStatus];
     self.activIndicator.center = self.view.center;
@@ -158,6 +173,10 @@
         [reach startNotifier];
     }
 }
+-(void)viewWillDisappear:(BOOL)animated
+{
+    infoUpdated = NO;
+}
 
 #pragma mark Weather Forecast
 //when network is present this function is called
@@ -165,7 +184,6 @@
             longitude:(NSString *)longi
 {
     [locationManager stopUpdatingLocation];
-    //[self.activIndicator startAnimating];
     NSURLSession *session = [NSURLSession sharedSession];
     NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/hourly/forecast/conditions/q/%@,%@.json",lat,longi];
     NSString* encodedUrl = [ApiCall stringByAddingPercentEscapesUsingEncoding:
@@ -210,10 +228,15 @@
             
             //hourly
             hourlyForecast = [json objectForKey:@"hourly_forecast"];
-            
-            [self performSelectorOnMainThread:@selector(updateInfo) withObject:NULL waitUntilDone:NO];
-            [self performSelectorOnMainThread:@selector(createScroll) withObject:NULL waitUntilDone:NO];
-            [self UpdateData];
+            if (!infoUpdated ) {
+                [self performSelectorOnMainThread:@selector(updateInfo) withObject:NULL waitUntilDone:NO];
+                [self performSelectorOnMainThread:@selector(createScroll) withObject:NULL waitUntilDone:NO];
+            }
+            long diff = [self daysBetween:lastVisited and:[NSDate date]];
+            if (diff > 1 )
+            {
+                [self UpdateData];
+            }
         }
         else
         {
@@ -230,7 +253,7 @@
     
     NSInteger hours = 24,width = 0;
     float labelwidth = 100.0f;
-    self.scroll.contentSize = CGSizeMake((labelwidth * hours), 100);
+    self.scroll.contentSize = CGSizeMake((labelwidth * hours), 80);
     self.scroll.backgroundColor = [UIColor clearColor];
     UIView *hourlyScroll = [[UIView alloc] initWithFrame:CGRectMake(0, 0, (labelwidth*hours), 80)];
     hourlyScroll.backgroundColor = [UIColor clearColor];
@@ -240,7 +263,7 @@
         NSArray *timings = [hourlyForecast[i] valueForKey:@"FCTTIME"];
         
         //time label
-        UILabel *time =  [[UILabel alloc] initWithFrame: CGRectMake(width,0,labelwidth,14)];
+        UILabel *time =  [[UILabel alloc] initWithFrame: CGRectMake(width,2,labelwidth,16)];
         time.textAlignment = NSTextAlignmentCenter;
         time.textColor = fontColor;
         [time setFont:[UIFont systemFontOfSize:10]];
@@ -252,14 +275,14 @@
         NSString *imageN = [NSString stringWithFormat:@"%@",[hourlyForecast[i] valueForKey:@"icon"]];
         UIImage *myShot = [UIImage imageNamed:imageN];
         UIImageView *myImageView = [[UIImageView alloc] initWithImage:myShot];
-        CGRect myFrame = CGRectMake(width , 16.0f, labelwidth,40);
+        CGRect myFrame = CGRectMake(width , 20, labelwidth,40);
         [myImageView setFrame:myFrame];
         
         //If your image is bigger than the frame then you can scale it
         [myImageView setContentMode:UIViewContentModeScaleAspectFit];
         
         //max min
-        UILabel *labelMaxMin =  [[UILabel alloc] initWithFrame: CGRectMake(width,56,labelwidth,14)];
+        UILabel *labelMaxMin =  [[UILabel alloc] initWithFrame: CGRectMake(width,62,labelwidth,14)];
         labelMaxMin.adjustsFontSizeToFitWidth = YES;
         labelMaxMin.textColor = fontColor;
         labelMaxMin.textAlignment = NSTextAlignmentCenter;
@@ -271,13 +294,12 @@
         if (Metric)
         {
             NSString *tempt = temp_c;
-            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℃",tempt]; //etc...[forecast[i] valueForKey:@"condition"],
+            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℃",tempt];
         }
         else
         {
             NSString *tempt = temp_f;
-            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℉",tempt]; //etc...[forecast[i] valueForKey:@"condition"],
-        }
+            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℉",tempt];        }
         labelMaxMin.backgroundColor = [UIColor clearColor];
         width+=labelwidth;
         
@@ -285,6 +307,7 @@
         [hourlyScroll addSubview:myImageView];
         [hourlyScroll addSubview:labelMaxMin];
     }
+    infoUpdated = YES;
     [self.scroll addSubview:hourlyScroll];
 }
 
@@ -297,13 +320,15 @@
     self.locationName = full;
     if (Metric)
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@ ℃",currentTemp_c];
-        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@\nHeat Index : %@\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
+        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_c];
+        self.tempUnit.text = @"℃";
+        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℃\nHeat Index : %@℃\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
     }
     else
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@ ℉",currentTemp_f];
-        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@\nHeat Index : %@\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
+        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_f];
+        self.tempUnit.text = @"℉";
+        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℉\nHeat Index : %@℉\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
     }
     self.weatherText.text = weatherType;
     self.Info.textColor = [UIColor whiteColor];
@@ -478,9 +503,8 @@
 
 - (IBAction)favbutton:(id)sender
 {
-    FavouritesTableViewController *faVC = [[FavouritesTableViewController alloc] init];
-    faVC.delegate = self;
-    [[self navigationController] pushViewController:faVC animated:YES];
+    FavouritesTableViewController *faVC = [self.storyboard instantiateViewControllerWithIdentifier:@"fvController"];
+    [self.navigationController pushViewController:faVC animated:YES];
 }
 
 - (IBAction)forecast:(UIButton *)sender
@@ -514,14 +538,10 @@
         sendDetails.Country = Country;
         sendDetails.longitude = self.longitude;
         sendDetails.latitude = self.latitude;
+        sendDetails.tempf = currentTemp_f;
+        sendDetails.tempc = currentTemp_c;
+        sendDetails.weatherType = weatherType;
     }
-}
--(void)senDetailsViewController:(FavouritesTableViewController *)controller didFinishEnteringItem:(NSDictionary *)item
-{
-    self.latitude = [item valueForKey:@"lat"];
-    self.longitude = [item valueForKey:@"long"];
-    self.locationName = [item valueForKey:@"name"];
-    self.setLocation = YES;
 }
 
 #pragma mark UserDefaults
@@ -531,7 +551,7 @@
     // Store the data
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"dd MM YYYY"];
+    [format setDateFormat:@"dd MM yyyy ZZZZ"];
     visited = [format stringFromDate:[NSDate date]];
     
     [defaults setObject:self.locationName forKey:@"location"];
@@ -542,6 +562,12 @@
     [defaults synchronize];
     
     NSLog(@"Data saved");
+}
+
+- (long)daysBetween:(NSDate *)dt1 and:(NSDate *)dt2 {
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:dt1 toDate:dt2 options:0];
+    return [components day]+1;
 }
 
 @end

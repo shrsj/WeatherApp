@@ -10,7 +10,11 @@
 #import <CoreData/CoreData.h>
 #import <Reachability.h>
 
-@interface ForecastViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
+@interface ForecastViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UILabel *weatherLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *icon;
+@property (weak, nonatomic) IBOutlet UILabel *tempLabel;
 
 @property (weak, nonatomic) IBOutlet UILabel *place;
 @property (weak, nonatomic) IBOutlet UITableView *table;
@@ -20,5 +24,8 @@
 @property NSString *Country;
 @property NSString *latitude;
 @property NSString *longitude;
+@property NSString *tempf;
+@property NSString *tempc;
+@property NSString *weatherType;
 
 @end
