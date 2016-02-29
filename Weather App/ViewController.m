@@ -281,8 +281,12 @@
     self.scroll.contentSize = CGSizeMake((labelwidth * hours), 80);
     self.scroll.backgroundColor = [UIColor clearColor];
     
+    for (UIView *subview in self.scroll.subviews)
+    {
+        [subview removeFromSuperview];
+    }
+    
     UIView *hourlyScroll = [[UIView alloc] init];
-    [[hourlyScroll subviews] makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
     hourlyScroll.frame = CGRectMake(0, 0, (labelwidth*hours), 80);
     hourlyScroll.backgroundColor = [UIColor clearColor];
     
