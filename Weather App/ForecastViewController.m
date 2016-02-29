@@ -7,6 +7,8 @@
 //
 
 #import "ForecastViewController.h"
+#define API_KEY @"b706ffe1f894f6be"
+#define API_KEY2 @"cdad743a382da6d1"
 
 @interface ForecastViewController ()
 {
@@ -25,6 +27,7 @@
     
     BOOL metric;
     BOOL reachable;
+    
 }
 @end
 
@@ -36,19 +39,21 @@
     // Do any additional setup after loading the view.
     self.table.delegate = self;
     self.table.dataSource = self;
-    self.place.text = [NSString stringWithFormat:@"%@, %@",self.Area,self.Country];
-    locationName = [NSString stringWithFormat:@"%@, %@",self.Area,self.Country];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    metric = [defaults boolForKey:@"metric"];
+    
+    self.place.text = [NSString stringWithFormat:@"%@",self.Area];
+    locationName = [NSString stringWithFormat:@"%@",self.Area];
     self.icon.image = [UIImage imageNamed:self.weatherType];
     self.weatherLabel.text = self.weatherType;
     if (metric) {
-        self.tempLabel.text= self.tempc;
+        self.tempLabel.text= [NSString stringWithFormat:@"%@℃",self.tempc];
     }
     else{
-        self.tempLabel.text = self.tempf;
+        self.tempLabel.text = [NSString stringWithFormat:@"%@℉",self.tempf];
     }
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    metric = [defaults boolForKey:@"metric"];
+    
     NSString *dated = [defaults objectForKey:@"lastVisited"];
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"dd MM yyyy ZZZZ"];
@@ -83,7 +88,7 @@
     [self.activityIndicator startAnimating];
     [self.view addSubview:self.activityIndicator];
     NSURLSession *session = [NSURLSession sharedSession];
-    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/forecast10day/q/%@,%@.json",latitude,longitude];
+    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/%@/forecast10day/q/%@,%@.json",API_KEY,latitude,longitude];
     NSString* encodedUrl = [ApiCall stringByAddingPercentEscapesUsingEncoding:
                             NSUTF8StringEncoding];
     NSURLSessionDataTask *dataTask = [session dataTaskWithURL:[NSURL URLWithString:encodedUrl] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
@@ -258,7 +263,7 @@
         NSString *imageN = [simpleForecast[indexPath.row] valueForKey:@"icon"];
         NSDictionary *tempohigh = [simpleForecast[indexPath.row] valueForKey:@"high"];
         NSDictionary *tempolow = [simpleForecast[indexPath.row] valueForKey:@"low"];
-        if (metric)
+        if (!metric)
         {
             high = [tempohigh objectForKey:@"fahrenheit"];
             low = [tempolow objectForKey:@"fahrenheit"];
@@ -292,50 +297,36 @@
     }
     return cell;
 }
-/*
- - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
- {
- UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 28)];
- /* Create custom view to display section header... 
- UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",self.weatherType]];
- 
- UIImageView *icon = [[UIImageView alloc] init];
- icon.frame = CGRectMake(8, 2, 10, 10);
- [icon setImage:image];
- 
- UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(12, 2, 15, 12)];
- [label setFont:[UIFont boldSystemFontOfSize:14]];
- label.text = self.weatherType;
- 
- UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(22, 14, 15, 10)];
- [label1 setFont:[UIFont boldSystemFontOfSize:10]];
- if (metric) {
- label.text = self.tempf;
- }
- else
- {
- label1.text = self.tempc;
- }
- 
- 
- 
- [view addSubview:label];
- [view setBackgroundColor:[UIColor colorWithRed:166/255.0 green:177/255.0 blue:186/255.0 alpha:1.0]]; //your background color...
- return view;
- 
- 
- }
- */
-
 
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    animation.fromValue = [NSNumber numberWithFloat:0.0f];
+    animation.toValue = [NSNumber numberWithFloat:1.0f];
+    animation.duration = 0.5;
+    animation.removedOnCompletion = NO;
+    animation.fillMode = kCAFillModeBoth;
+    animation.additive = NO;
+    
+    [self.icon.layer addAnimation:animation forKey:@"opacityin"];
+    [self.tempLabel.layer addAnimation:animation forKey:@"opacityin"];
+    [self.weatherLabel.layer addAnimation:animation forKey:@"opacityin"];
     self.icon.hidden = NO;
     self.tempLabel.hidden = NO;
     self.weatherLabel.hidden = NO;
 }
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    animation.fromValue = [NSNumber numberWithFloat:1.0f];
+    animation.toValue = [NSNumber numberWithFloat:0.0f];
+    animation.duration = 1.0;
+    animation.removedOnCompletion = NO;
+    animation.fillMode = kCAFillModeBoth;
+    animation.additive = NO;
+    [self.icon.layer addAnimation:animation forKey:@"opacityout"];
+    [self.tempLabel.layer addAnimation:animation forKey:@"opacityout"];
+    [self.weatherLabel.layer addAnimation:animation forKey:@"opacityout"];
     self.icon.hidden = YES;
     self.tempLabel.hidden = YES;
     self.weatherLabel.hidden = YES;

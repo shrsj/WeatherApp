@@ -10,6 +10,9 @@
 #import "ForecastViewController.h"
 #import <Social/Social.h>
 
+#define API_KEY @"b706ffe1f894f6be"
+#define API_KEY2 @"cdad743a382da6d1"
+
 @interface ViewController () 
 {
     CLLocationManager *locationManager;
@@ -102,7 +105,6 @@
         NSLog(@"It's day time");
         background = [UIImage imageNamed:@"znight"];
     }
-    [self getAllLocations];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -121,8 +123,14 @@
     }
     else
     {
+        [self getAllLocations];
         self.setLocation = YES;
         self.locationName = check;
+        NSUInteger storedIndex = [place indexOfObject:check];
+        self.latitude = [lats objectAtIndex:storedIndex];
+        self.longitude = [longs objectAtIndex:storedIndex];
+        NSLog(@"%lu %@ %@",(unsigned long)storedIndex,self.latitude,self.longitude);
+        NSLog(@"%@ %@",place,check);
     }
     
     Metric = [defaults boolForKey:@"metric"];
@@ -147,8 +155,17 @@
         else
         {
             [self getData];
-            [self UpdateFromDB];
-            [self updateInfo];
+            if ([presentConditions count] != 0) {
+                
+                [self UpdateFromDB];
+                [self updateInfo];
+            }
+            else
+            {
+                errorMsg = @"Oops!! Data unavailable.\nPlease ensure we are connected to the Network";
+                [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
+            }
+            
             errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
             [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
         }
@@ -167,8 +184,16 @@
             //load the first location in the array
             self.locationName = [defaults objectForKey:@"location"];
             [self getData];
-            [self UpdateFromDB];
-            [self updateInfo];
+            
+            if ([presentConditions count] != 0) {
+                [self UpdateFromDB];
+                [self updateInfo];
+            }
+            else
+            {
+                errorMsg = @"Oops!! Data unavailable.\nPlease ensure we are connected to the Network";
+                [self displayAlert];
+            }
         }
         [reach startNotifier];
     }
@@ -185,7 +210,7 @@
 {
     [locationManager stopUpdatingLocation];
     NSURLSession *session = [NSURLSession sharedSession];
-    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/cdad743a382da6d1/hourly/forecast/conditions/q/%@,%@.json",lat,longi];
+    NSString *ApiCall = [NSString stringWithFormat:@"https://api.wunderground.com/api/%@/hourly/forecast/conditions/q/%@,%@.json",API_KEY,lat,longi];
     NSString* encodedUrl = [ApiCall stringByAddingPercentEscapesUsingEncoding:
                             NSUTF8StringEncoding];
     NSURLSessionDataTask *dataTask = [session dataTaskWithURL:[NSURL URLWithString:encodedUrl] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
@@ -255,7 +280,10 @@
     float labelwidth = 100.0f;
     self.scroll.contentSize = CGSizeMake((labelwidth * hours), 80);
     self.scroll.backgroundColor = [UIColor clearColor];
-    UIView *hourlyScroll = [[UIView alloc] initWithFrame:CGRectMake(0, 0, (labelwidth*hours), 80)];
+    
+    UIView *hourlyScroll = [[UIView alloc] init];
+    [[hourlyScroll subviews] makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+    hourlyScroll.frame = CGRectMake(0, 0, (labelwidth*hours), 80);
     hourlyScroll.backgroundColor = [UIColor clearColor];
     
     for(int i = 0; i < hours; i++)
@@ -266,6 +294,7 @@
         UILabel *time =  [[UILabel alloc] initWithFrame: CGRectMake(width,2,labelwidth,16)];
         time.textAlignment = NSTextAlignmentCenter;
         time.textColor = fontColor;
+        time.text = nil;
         [time setFont:[UIFont systemFontOfSize:10]];
         time.backgroundColor = [UIColor clearColor];
         
@@ -273,7 +302,8 @@
         
         //image icons
         NSString *imageN = [NSString stringWithFormat:@"%@",[hourlyForecast[i] valueForKey:@"icon"]];
-        UIImage *myShot = [UIImage imageNamed:imageN];
+        UIImage *myShot = [[UIImage alloc] init];
+        myShot = [UIImage imageNamed:imageN];
         UIImageView *myImageView = [[UIImageView alloc] initWithImage:myShot];
         CGRect myFrame = CGRectMake(width , 20, labelwidth,40);
         [myImageView setFrame:myFrame];
@@ -283,6 +313,7 @@
         
         //max min
         UILabel *labelMaxMin =  [[UILabel alloc] initWithFrame: CGRectMake(width,62,labelwidth,14)];
+        labelMaxMin.text = @"";
         labelMaxMin.adjustsFontSizeToFitWidth = YES;
         labelMaxMin.textColor = fontColor;
         labelMaxMin.textAlignment = NSTextAlignmentCenter;
@@ -299,7 +330,8 @@
         else
         {
             NSString *tempt = temp_f;
-            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℉",tempt];        }
+            labelMaxMin.text = [NSString stringWithFormat:@" %@ ℉",tempt];
+        }
         labelMaxMin.backgroundColor = [UIColor clearColor];
         width+=labelwidth;
         
@@ -412,13 +444,15 @@
     NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Place"];
     allLocations = [[managedObjContext executeFetchRequest:request error:nil] mutableCopy];
     
-    NSUInteger count = 0;
+    place = [[NSMutableArray alloc] init];
+    lats = [[NSMutableArray alloc] init];
+    longs = [[NSMutableArray alloc] init];
+    
     for (NSManagedObject *location in allLocations)
     {
-        [place setObject:[location valueForKey:@"placeName"] atIndexedSubscript:count];
-        [lats setObject:[location valueForKey:@"latitude"] atIndexedSubscript:count];
-        [longs setObject:[location valueForKey:@"longitude"] atIndexedSubscript:count];
-        count = count +1;
+        [place addObject:[location valueForKey:@"placeName"]];
+        [lats addObject:[location valueForKey:@"latitude"]];
+        [longs addObject:[location valueForKey:@"longitude"]];
     }
 }
 
@@ -484,7 +518,7 @@
 -(void) displayAlert
 {
     NSString *msg = @"Oops....";
-    NSString *fullMessage = [NSString stringWithFormat:@"%@ %@\n %@",msg,errorMsg,errorType];
+    NSString *fullMessage = [NSString stringWithFormat:@"%@\n %@",msg,errorMsg];
     UIAlertController * alert=   [UIAlertController
                                   alertControllerWithTitle:@"RSS Feeds"
                                   message:fullMessage
@@ -534,8 +568,7 @@
     ForecastViewController *sendDetails = segue.destinationViewController;
     if ([[segue identifier] isEqualToString:@"forecast"])
     {
-        sendDetails.Area = Area;
-        sendDetails.Country = Country;
+        sendDetails.Area = self.locationName;
         sendDetails.longitude = self.longitude;
         sendDetails.latitude = self.latitude;
         sendDetails.tempf = currentTemp_f;

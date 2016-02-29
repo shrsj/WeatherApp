@@ -21,7 +21,6 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 @property NSString *Area;
-@property NSString *Country;
 @property NSString *latitude;
 @property NSString *longitude;
 @property NSString *tempf;

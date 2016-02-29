@@ -17,6 +17,12 @@
     NSString *cityName;
     NSArray *searchList;
     NSMutableArray *favLocations;
+    
+    NSMutableArray *conditions;
+    NSString *weatherType;
+    NSString *currentTemp;
+    
+    BOOL metric;
 }
 
 @end
@@ -31,9 +37,11 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    metric = [defaults boolForKey:@"metric"];
     // Fetch the devices from persistent data store
     [self getalldata];
-    
+    [self getPresentConditions];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -63,6 +71,17 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Place"];
     favLocations = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
 }
+
+-(void)getPresentConditions
+{
+    NSManagedObjectContext *cont = [self managedObjectContext];
+    NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"PresentConditions"];
+    conditions = [[NSMutableArray alloc] init];
+    NSError *error = nil;
+    conditions = [[cont executeFetchRequest:fetch error:&error] mutableCopy];
+    
+}
+
 
 #pragma mark - Table view data source
 
@@ -146,7 +165,23 @@
                 UILabel *name = (UILabel *)[cell viewWithTag:1];
                 name.text = [device valueForKey:@"placeName"];
                 UILabel *ll = (UILabel *)[cell viewWithTag:2];
-                ll.text = [NSString stringWithFormat:@"%@ , %@",[device valueForKey:@"latitude"],[device valueForKey:@"longitude"]];
+                
+                if ([conditions count] != 0 && [conditions count] > [indexPath row])
+                {
+                    NSManagedObject *detail = [conditions objectAtIndex:[indexPath row]];
+                    if (metric)
+                    {
+                        ll.text = [NSString stringWithFormat:@"%@ , %@℃",[detail valueForKey:@"weather"],[detail valueForKey:@"tempc"]];
+                    }
+                    else
+                    {
+                        ll.text = [NSString stringWithFormat:@"%@ , %@℉",[detail valueForKey:@"weather"],[detail valueForKey:@"tempf"]];
+                    }
+                }
+                else
+                {
+                    ll.text = @" ";
+                }
             }
         }
         return cell;
@@ -265,11 +300,15 @@
 - (IBAction)setToCelcius:(UIButton *)sender {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:YES forKey:@"metric"];
+    self.setFarenheit.alpha = 0.5f;
+    self.setCel.alpha = 1.0f;
 }
 
 - (IBAction)setToFarenheit:(UIButton *)sender {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:NO forKey:@"metric"];
+    self.setFarenheit.alpha = 1.0f;
+    self.setCel.alpha = 0.5f;
 }
 @end
 
