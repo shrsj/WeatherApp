@@ -39,14 +39,11 @@
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     metric = [defaults boolForKey:@"metric"];
-    // Fetch the devices from persistent data store
     [self getalldata];
-    [self getPresentConditions];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 -(void)viewDidDisappear:(BOOL)animated
@@ -72,10 +69,11 @@
     favLocations = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
 }
 
--(void)getPresentConditions
+-(void)getPresentConditions:(NSString *)locationName
 {
     NSManagedObjectContext *cont = [self managedObjectContext];
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"PresentConditions"];
+    [fetch setPredicate:[NSPredicate predicateWithFormat:@"place == %@",locationName]];
     conditions = [[NSMutableArray alloc] init];
     NSError *error = nil;
     conditions = [[cont executeFetchRequest:fetch error:&error] mutableCopy];
@@ -118,6 +116,17 @@
 
 #pragma mark Table View Delegate Methods
 
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([indexPath section] == 0) {
+        return 80;
+    }
+    else
+    {
+        return 70;
+    }
+}
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return YES;
@@ -139,7 +148,6 @@
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert)
     {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
 }
 
@@ -159,16 +167,14 @@
         {
             if (!(favLocations == 0))
             {
-                //cell.textLabel.text = [favLocations[indexPath.row] valueForKey:@"name"];
                 NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-                NSLog(@"%@ ",[device valueForKey:@"placeName"]);
                 UILabel *name = (UILabel *)[cell viewWithTag:1];
                 name.text = [device valueForKey:@"placeName"];
                 UILabel *ll = (UILabel *)[cell viewWithTag:2];
-                
-                if ([conditions count] != 0 && [conditions count] > [indexPath row])
+                [self getPresentConditions:[device valueForKey:@"placeName"]];
+                if ([conditions count] != 0 )
                 {
-                    NSManagedObject *detail = [conditions objectAtIndex:[indexPath row]];
+                    NSManagedObject *detail = [conditions objectAtIndex:0];
                     if (metric)
                     {
                         ll.text = [NSString stringWithFormat:@"%@ , %@℃",[detail valueForKey:@"weather"],[detail valueForKey:@"tempc"]];
@@ -235,21 +241,25 @@
             }
             [self.search setActive:NO];
             isFiltered = NO;
+            [self getalldata];
             [self.tableView reloadData];
         }
         else
         {
             [self.search setActive:NO];
             isFiltered = NO;
+            [self getalldata];
             [self.tableView reloadData];
         }
     }
     else if (isFiltered == NO)
     {
-        NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setObject:[device valueForKey:@"placeName"] forKey:@"favSet"];
-        [[self navigationController] popToRootViewControllerAnimated:YES];
+        if ([indexPath section] == 0) {
+            NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            [defaults setObject:[device valueForKey:@"placeName"] forKey:@"favSet"];
+            [[self navigationController] popToRootViewControllerAnimated:YES];
+        }
     }
 }
 
@@ -311,83 +321,4 @@
     self.setCel.alpha = 0.5f;
 }
 @end
-
-// Delete the row from the data source
-//[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-
-
-// Uncomment the following line to preserve selection between presentations.
-// self.clearsSelectionOnViewWillAppear = NO;
-// Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-// self.navigationItem.rightBarButtonItem = self.editButtonItem;
-
-/* NSManagedObjectContext *context = [self managedObjectContext];
- // Create a new managed object
- NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
- NSEntityDescription *entity = [NSEntityDescription
- entityForName:@"Place" inManagedObjectContext:context];
- [fetchRequest setEntity:entity];
- NSError *error = nil;
- NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
- for (NSManagedObject *locations in fetchedObjects)
- {
- NSString *location = [locations valueForKey:@"placeName"];
- NSString *lati = [locations valueForKey:@"latitude"];
- NSString *longi = [locations valueForKey:@"longitude"];
- NSMutableDictionary *locationDict = [[NSMutableDictionary alloc] init];
- 
- [locationDict setObject:location forKey:@"location"];
- [locationDict setObject:lati forKey:@"latitude"];
- [locationDict setObject:longi forKey:@"longitude"];
- [favLocations addObject:locationDict];
- }
- NSLog(@"%lu %@",(unsigned long)[fetchedObjects count],favLocations);*/
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- 
- 
- #import <UIKit/UIKit.h>
- #import <CoreData/CoreData.h>
- 
- 
- @class ViewController;
- @class FavouritesTableViewController;
- 
- @protocol FavouritesTableViewControllerDelegate<NSObject>
- 
- - (void)senDetailsViewController:(FavouritesTableViewController *)controller didFinishEnteringItem:(NSDictionary *)item;
- 
- @end
- 
- @interface FavouritesTableViewController : UITableViewController <UISearchControllerDelegate,UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
- 
- @property (strong, nonatomic) IBOutlet UISearchController *search;
- @property (nonatomic, weak) id <FavouritesTableViewControllerDelegate> delegate;
- 
- @end
- 
- 
- 
- */
 

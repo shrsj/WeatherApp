@@ -36,7 +36,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
     self.table.delegate = self;
     self.table.dataSource = self;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -46,10 +45,12 @@
     locationName = [NSString stringWithFormat:@"%@",self.Area];
     self.icon.image = [UIImage imageNamed:self.weatherType];
     self.weatherLabel.text = self.weatherType;
-    if (metric) {
+    if (metric)
+    {
         self.tempLabel.text= [NSString stringWithFormat:@"%@℃",self.tempc];
     }
-    else{
+    else
+    {
         self.tempLabel.text = [NSString stringWithFormat:@"%@℉",self.tempf];
     }
     
@@ -101,11 +102,21 @@
             details = [simpleForecast valueForKey:@"date"];
             count = [simpleForecast count];
             long diff = [self daysBetween:lastVisited and:[NSDate date]];
+            NSUInteger entries = [self getCount];
             
-            if (diff > 1 )
+            if (entries == 0)
             {
-                [self UpdateData];
+                [self InsertData];
             }
+            else
+            {
+                if (diff > 1 )
+                {
+                    [self deleteData];
+                    [self InsertData];
+                }
+            }
+            
             [self.table performSelectorOnMainThread:@selector(reloadData) withObject:Nil waitUntilDone:NO];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.activityIndicator stopAnimating];
@@ -115,8 +126,7 @@
             {
                 NSDictionary *response = [jsonf objectForKey:@"response"];
                 NSDictionary *error = [response objectForKey:@"error"];
-                errorMsg = [error objectForKey:@"description"];
-                errorType = [error objectForKey:@"type"];
+                errorMsg = [NSString stringWithFormat:@"%@,\n%@",[error objectForKey:@"description"],[error objectForKey:@"type"]];
                 [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
             }
         }
@@ -134,9 +144,8 @@
     return context;
 }
 
--(void)UpdateData
+-(void)deleteData
 {
-    //deletes data since we have updated info
     NSManagedObjectContext *context = [self managedObjectContext];
     NSFetchRequest *all = [[NSFetchRequest alloc] init];
     [all setEntity:[NSEntityDescription entityForName:@"Forecast" inManagedObjectContext:context]];
@@ -152,12 +161,11 @@
         NSAssert(NO, @"Save should not fail\n%@", [error localizedDescription]);
         abort();
     }
-    //Insert new updated info
-    NSDate *date = [NSDate date];
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setDateFormat:@"dd MM yyyy"];
-    date = [dateFormat dateFromString:[dateFormat stringFromDate:[NSDate date]]];
-    
+}
+
+-(void)InsertData
+{
+    NSManagedObjectContext *context = [self managedObjectContext];
     for (int i = 0; i< count; i++)
     {
         NSDictionary *tempohigh = [simpleForecast[i] valueForKey:@"high"];
@@ -202,7 +210,7 @@
             [condition setValue:conditions forKey:@"condition"];
         }
         
-        error = nil;
+        NSError *error = nil;
         // Save the object to persistent store
         if (![context save:&error])
         {
@@ -224,6 +232,30 @@
         [self.activityIndicator removeFromSuperview];
         [self.table reloadData];
     });
+}
+
+-(NSUInteger)getCount
+{
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSError *error = nil;
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Forecast"];
+    [request setPredicate:[NSPredicate predicateWithFormat:@"location = %@",locationName]];
+    [request setFetchLimit:1];
+    NSUInteger count1 = [context countForFetchRequest:request error:&error];
+    if (count1 == NSNotFound)
+    {
+        errorMsg = @"some error occured while accessing data";
+        [self displayAlert];
+        return 0;
+    }
+    else if (count1 == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return count1;
+    }
 }
 
 #pragma mark TableView Delegate Methods
@@ -334,7 +366,7 @@
 -(void) displayAlert
 {
     NSString *msg = @"Oops....";
-    NSString *fullMessage = [NSString stringWithFormat:@"%@ %@\n %@",msg,errorMsg,errorType];
+    NSString *fullMessage = [NSString stringWithFormat:@"%@\n %@",msg,errorMsg];
     UIAlertController * alert=   [UIAlertController
                                   alertControllerWithTitle:@"RSS Feeds"
                                   message:fullMessage

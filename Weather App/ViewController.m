@@ -82,8 +82,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    
     locationManager = [CLLocationManager new];
     locationManager.delegate = self;
     locationManager.distanceFilter = kCLDistanceFilterNone;
@@ -92,24 +90,10 @@
     fontColor = [UIColor whiteColor];
     self.screenHeight = [UIScreen mainScreen].bounds.size.height;
     
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"HH.mm"];
-    NSString *strCurrentTime = [dateFormatter stringFromDate:[NSDate date]];
-    
-    NSLog(@"Check float value: %.2f",[strCurrentTime floatValue]);
-    if ([strCurrentTime floatValue] >= 18.00 || [strCurrentTime floatValue]  <= 6.00)
-    {
-        NSLog(@"It's night time");
-        background = [UIImage imageNamed:@"znight"];
-    }else{
-        NSLog(@"It's day time");
-        background = [UIImage imageNamed:@"znight"];
-    }
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -119,7 +103,6 @@
     
     if ([check isEqualToString:@"clear"]) {
         self.setLocation = NO;
-        infoUpdated = NO;
     }
     else
     {
@@ -162,12 +145,9 @@
             }
             else
             {
-                errorMsg = @"Oops!! Data unavailable.\nPlease ensure we are connected to the Network";
+                errorMsg = @"Data unavailable.\nPlease ensure You are connected to the Network";
                 [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
             }
-            
-            errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
-            [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
         }
         [reach startNotifier];
     }
@@ -179,9 +159,6 @@
         }
         else
         {
-            errorMsg = @"Because of unavailability of Network Realtime information wont be available.";
-            //[self displayAlert];
-            //load the first location in the array
             self.locationName = [defaults objectForKey:@"location"];
             [self getData];
             
@@ -204,7 +181,7 @@
 }
 
 #pragma mark Weather Forecast
-//when network is present this function is called
+//when network is present
 -(void)weatherDetails:(NSString *)lat
             longitude:(NSString *)longi
 {
@@ -222,15 +199,19 @@
             {
                 NSDictionary *response = [json objectForKey:@"response"];
                 NSDictionary *error = [response objectForKey:@"error"];
-                errorMsg = [error objectForKey:@"description"];
-                errorType = [error objectForKey:@"type"];
+                errorMsg = [NSString stringWithFormat:@"%@,\n%@",[error objectForKey:@"description"],[error objectForKey:@"type"]];
                 [self performSelectorOnMainThread:@selector(displayAlert) withObject:NULL waitUntilDone:YES];
             }
             
             //Location Display
             NSDictionary *placemark = [conditions objectForKey:@"display_location"];
-            full = [placemark objectForKey:@"full"];
-            
+            if (self.setLocation) {
+                full = self.locationName;
+            }
+            else
+            {
+                full = [placemark objectForKey:@"full"];
+            }
             // Display Current Temperatures
             weatherType = [conditions objectForKey:@"icon"];
             humidity = [conditions objectForKey:@"relative_humidity"];
@@ -257,10 +238,19 @@
                 [self performSelectorOnMainThread:@selector(updateInfo) withObject:NULL waitUntilDone:NO];
                 [self performSelectorOnMainThread:@selector(createScroll) withObject:NULL waitUntilDone:NO];
             }
+            NSUInteger entries = [self getCount];
             long diff = [self daysBetween:lastVisited and:[NSDate date]];
-            if (diff > 1 )
+            if (entries == 0)
             {
-                [self UpdateData];
+                [self insertData];
+            }
+            else
+            {
+                if (diff > 1 )
+                {
+                    [self deleteData];
+                    [self insertData];
+                }
             }
         }
         else
@@ -312,10 +302,8 @@
         CGRect myFrame = CGRectMake(width , 20, labelwidth,40);
         [myImageView setFrame:myFrame];
         
-        //If your image is bigger than the frame then you can scale it
         [myImageView setContentMode:UIViewContentModeScaleAspectFit];
         
-        //max min
         UILabel *labelMaxMin =  [[UILabel alloc] initWithFrame: CGRectMake(width,62,labelwidth,14)];
         labelMaxMin.text = @"";
         labelMaxMin.adjustsFontSizeToFitWidth = YES;
@@ -353,16 +341,32 @@
     [self.activIndicator stopAnimating];
     [self.activIndicator removeFromSuperview];
     self.Place.text = full;
-    self.locationName = full;
+    if (self.setLocation) {
+        self.locationName = self.locationName;
+    }
+    else
+    {
+        self.locationName = full;
+        
+    }
     if (Metric)
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_c];
+        NSString *tempc = currentTemp_c;
+        if (tempc.length > 1) {
+            tempc = [tempc substringToIndex:2];
+        }
+        
+        self.Temperature.text = [NSString stringWithFormat:@"%@",tempc];
         self.tempUnit.text = @"℃";
         self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℃\nHeat Index : %@℃\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
     }
     else
     {
-        self.Temperature.text = [NSString stringWithFormat:@"%@",currentTemp_f];
+        NSString *tempf = currentTemp_f;
+        if (tempf.length > 1) {
+            tempf = [tempf substringToIndex:2];
+        }
+        self.Temperature.text = [NSString stringWithFormat:@"%@",tempf];
         self.tempUnit.text = @"℉";
         self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℉\nHeat Index : %@℉\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
     }
@@ -372,10 +376,10 @@
     self.weatherIcon.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",weatherType]];
     self.summary.text = sumary;
     
-    [self saveAppdetails];
+    [self saveAppDetails];
     
 }
-//When network doesnt exit it updates from db
+//When network doesnt exist update from db
 -(void)UpdateFromDB
 {
     NSManagedObject *show = [presentConditions objectAtIndex:0];
@@ -459,18 +463,40 @@
         [longs addObject:[location valueForKey:@"longitude"]];
     }
 }
-
--(void)UpdateData
+-(NSUInteger)getCount
 {
-    //deletes data since we have updated info
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSError *error = nil;
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"PresentConditions"];
+    [request setPredicate:[NSPredicate predicateWithFormat:@"place = %@", self.locationName]];
+    [request setFetchLimit:1];
+    NSUInteger count = [context countForFetchRequest:request error:&error];
+    if (count == NSNotFound)
+    {
+        errorMsg = @"some error occured while accessing data";
+        [self displayAlert];
+        return 0;
+    }
+    else if (count == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return count;
+    }
+}
+
+-(void)deleteData
+{
     NSManagedObjectContext *context = [self managedObjectContext];
     NSFetchRequest *all = [[NSFetchRequest alloc] init];
     [all setEntity:[NSEntityDescription entityForName:@"PresentConditions" inManagedObjectContext:context]];
-    [all setIncludesPropertyValues:NO]; //only fetch the managedObjectID
-    
+    [all setIncludesPropertyValues:NO];
+    [all setPredicate:[NSPredicate predicateWithFormat:@"place == %@",_locationName]];
     NSError *error = nil;
     NSArray *data = [context executeFetchRequest:all error:&error];
-    //error handling goes here
+    
     for (NSManagedObject *conditn in data) {
         [context deleteObject:conditn];
     }
@@ -478,14 +504,20 @@
         NSAssert(NO, @"Save should not fail\n%@", [error localizedDescription]);
         abort();
     }
-    [presentConditions removeObjectAtIndex:0];
+}
+
+-(void)insertData
+{
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSManagedObjectModel *condition = [NSEntityDescription insertNewObjectForEntityForName:@"PresentConditions" inManagedObjectContext:context];
     
     //Insert new updated info
     NSDate *date = [NSDate date];
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"EEEE, dd : MMMM : yyyy"];
     date = [dateFormat dateFromString:[dateFormat stringFromDate:[NSDate date]]];
-    NSManagedObjectModel *condition = [NSEntityDescription insertNewObjectForEntityForName:@"PresentConditions" inManagedObjectContext:context];
+    
+    NSLog(@"inserted data for location %@ ",full);
     [condition setValue:date forKey:@"day"];
     [condition setValue:feels_f forKey:@"feelsf"];
     [condition setValue:feels_c forKey:@"feelsc"];
@@ -500,6 +532,7 @@
     [condition setValue:visibilityString forKey:@"visibility"];
     [condition setValue:weatherType forKey:@"weather"];
     [condition setValue:windString forKey:@"wind"];
+    NSError *error = nil;
     
     error = nil;
     // Save the object to persistent store
@@ -583,7 +616,7 @@
 
 #pragma mark UserDefaults
 
--(void)saveAppdetails
+-(void)saveAppDetails
 {
     // Store the data
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -605,6 +638,22 @@
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:dt1 toDate:dt2 options:0];
     return [components day]+1;
+}
+-(void)checkDayTime
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH.mm"];
+    NSString *strCurrentTime = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSLog(@"Check float value: %.2f",[strCurrentTime floatValue]);
+    if ([strCurrentTime floatValue] >= 18.00 || [strCurrentTime floatValue]  <= 6.00)
+    {
+        NSLog(@"It's night time");
+        background = [UIImage imageNamed:@"znight"];
+    }else{
+        NSLog(@"It's day time");
+        background = [UIImage imageNamed:@"znight"];
+    }
 }
 
 @end
