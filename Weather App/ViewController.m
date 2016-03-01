@@ -589,7 +589,7 @@
         SLComposeViewController *vc = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
         NSString *status = [NSString stringWithFormat:@"Hi, Here's what You got for todays weather %@",sumary];
         [vc setInitialText:status];
-        [vc addImage:[UIImage imageNamed:icon]];
+        [vc addImage:[UIImage imageNamed:weatherType]];
         [self presentViewController:vc animated:YES completion:nil];
     }
     else
