@@ -46,13 +46,13 @@
     metric = [defaults boolForKey:@"metric"];
     if (metric)
     {
-        self.SetCelcius.alpha = 1.0;
+        self.setCel.alpha = 1.0;
         self.setFarenheit.alpha = 0.5;
     }
     else
     {
         self.setFarenheit.alpha = 1.0;
-        self.SetCelcius.alpha = 0.5;
+        self.setCel.alpha = 0.5;
     }
     [self getalldata];
 }
@@ -315,8 +315,8 @@
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     [defaults setBool:YES forKey:@"metric"];
     self.setFarenheit.alpha = 0.5;
-    self.SetCelcius.alpha = 1.0;
-    self.SetCelcius.font = [UIFont boldSystemFontOfSize:20];
+    self.setCel.alpha = 1.0;
+    self.setCel.font = [UIFont boldSystemFontOfSize:20];
     self.setFarenheit.font = [UIFont systemFontOfSize:18];
     metric = YES;
     [self.tableView reloadData];
@@ -326,9 +326,9 @@
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     [defaults setBool:NO forKey:@"metric"];
     self.setFarenheit.alpha = 1.0;
-    self.SetCelcius.alpha = 0.5;
+    self.setCel.alpha = 0.5;
     self.setFarenheit.font = [UIFont boldSystemFontOfSize:20];
-    self.SetCelcius.font = [UIFont systemFontOfSize:18];
+    self.setCel.font = [UIFont systemFontOfSize:18];
     metric = NO;
     [self.tableView reloadData];
 }

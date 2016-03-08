@@ -17,5 +17,8 @@
 - (IBAction)setToFarenheit:(UIButton *)sender;
 @property (weak, nonatomic) IBOutlet UIButton *setCel;
 @property (weak, nonatomic) IBOutlet UIButton *setFarenheit;
+@property (weak, nonatomic) IBOutlet UIView *footers;
+
+
 
 @end

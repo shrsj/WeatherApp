@@ -15,6 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="sectionIndexBackgroundColor" red="0.90196079015731812" green="0.90196079015731812" blue="0.90196079015731812" alpha="1" colorSpace="calibratedRGB"/>
                         <searchBar key="tableHeaderView" contentMode="redraw" id="yN7-sc-Bxj">
                             <rect key="frame" x="0.0" y="64" width="600" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -23,6 +24,63 @@
                                 <outlet property="delegate" destination="O4u-w1-dMn" id="1Kx-O0-Afd"/>
                             </connections>
                         </searchBar>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="ZPj-o1-WwF">
+                            <rect key="frame" x="0.0" y="499" width="600" height="101"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SGk-rX-IYp">
+                                    <rect key="frame" x="266" y="0.0" width="69" height="22"/>
+                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set Temperature Unit " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ehM-d6-fAy">
+                                    <rect key="frame" x="20" y="20" width="182" height="61"/>
+                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Sq-z9-pA0">
+                                    <rect key="frame" x="550" y="20" width="30" height="61"/>
+                                    <state key="normal" title="℉"/>
+                                    <connections>
+                                        <action selector="setToFarenheit:" destination="O4u-w1-dMn" eventType="touchUpInside" id="pxc-FQ-M9a"/>
+                                    </connections>
+                                </button>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="/" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V6c-PX-ZDG">
+                                    <rect key="frame" x="527" y="20" width="15" height="61"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="15" id="N07-td-bQF"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1SQ-pw-lyV">
+                                    <rect key="frame" x="489" y="20" width="30" height="61"/>
+                                    <state key="normal" title="℃"/>
+                                    <connections>
+                                        <action selector="setToCelcius:" destination="O4u-w1-dMn" eventType="touchUpInside" id="IIE-9L-2a8"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="V6c-PX-ZDG" secondAttribute="bottom" constant="20" symbolic="YES" id="3Je-5t-UdJ"/>
+                                <constraint firstItem="0Sq-z9-pA0" firstAttribute="leading" secondItem="V6c-PX-ZDG" secondAttribute="trailing" constant="8" symbolic="YES" id="8Ba-el-JEg"/>
+                                <constraint firstAttribute="bottom" secondItem="1SQ-pw-lyV" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcj-hC-9Av"/>
+                                <constraint firstItem="ehM-d6-fAy" firstAttribute="leading" secondItem="ZPj-o1-WwF" secondAttribute="leading" constant="20" symbolic="YES" id="SDR-gl-wRI"/>
+                                <constraint firstAttribute="bottom" secondItem="ehM-d6-fAy" secondAttribute="bottom" constant="20" symbolic="YES" id="ZiG-pf-ws4"/>
+                                <constraint firstItem="V6c-PX-ZDG" firstAttribute="top" secondItem="ZPj-o1-WwF" secondAttribute="top" constant="20" symbolic="YES" id="agX-bv-8X2"/>
+                                <constraint firstAttribute="trailing" secondItem="0Sq-z9-pA0" secondAttribute="trailing" constant="20" symbolic="YES" id="bD2-Na-idq"/>
+                                <constraint firstItem="SGk-rX-IYp" firstAttribute="centerX" secondItem="ZPj-o1-WwF" secondAttribute="centerX" id="ez3-Q3-rRy"/>
+                                <constraint firstItem="SGk-rX-IYp" firstAttribute="top" secondItem="ZPj-o1-WwF" secondAttribute="top" id="m1N-at-OEI"/>
+                                <constraint firstItem="V6c-PX-ZDG" firstAttribute="leading" secondItem="1SQ-pw-lyV" secondAttribute="trailing" constant="8" symbolic="YES" id="s7Z-Mt-AH9"/>
+                                <constraint firstItem="0Sq-z9-pA0" firstAttribute="top" secondItem="ZPj-o1-WwF" secondAttribute="top" constant="20" symbolic="YES" id="sXB-y2-OvR"/>
+                                <constraint firstAttribute="bottom" secondItem="0Sq-z9-pA0" secondAttribute="bottom" constant="20" symbolic="YES" id="ttX-Ag-q5g"/>
+                                <constraint firstItem="1SQ-pw-lyV" firstAttribute="top" secondItem="ZPj-o1-WwF" secondAttribute="top" constant="20" symbolic="YES" id="xDn-8q-cwQ"/>
+                                <constraint firstItem="ehM-d6-fAy" firstAttribute="top" secondItem="ZPj-o1-WwF" secondAttribute="top" constant="20" symbolic="YES" id="zNU-MB-cAb"/>
+                            </constraints>
+                        </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" rowHeight="80" id="H7H-pV-gur">
                                 <rect key="frame" x="0.0" y="136" width="600" height="80"/>
@@ -56,8 +114,11 @@
                     <toolbarItems/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="footers" destination="ZPj-o1-WwF" id="stF-4o-neP"/>
                         <outlet property="search" destination="fRA-oV-15p" id="A2m-H4-8Bw"/>
                         <outlet property="searchDisplayController" destination="fRA-oV-15p" id="a4g-Oj-FnZ"/>
+                        <outlet property="setCel" destination="1SQ-pw-lyV" id="HvE-kE-xY7"/>
+                        <outlet property="setFarenheit" destination="0Sq-z9-pA0" id="1Ok-9r-7NV"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MUj-c4-cSI" userLabel="First Responder" sceneMemberID="firstResponder"/>
