@@ -4,35 +4,25 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Weather App.xcscheme</key>
+		<key>Pods.xcscheme</key>
 		<dict>
-			<key>orderHint</key>
-			<integer>0</integer>
+			<key>isShown</key>
+			<false/>
 		</dict>
-		<key>WeatherWidget.xcscheme</key>
+		<key>Reachability.xcscheme</key>
 		<dict>
-			<key>orderHint</key>
-			<integer>4</integer>
+			<key>isShown</key>
+			<false/>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>C45129601C5F688C00094822</key>
+		<key>1485B6CCC99B475A7216E2B02B4B8E02</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>C451297C1C5F688C00094822</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>C45129871C5F688C00094822</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>C4E030551C8EBDA8008B4BDE</key>
+		<key>579B09A8FD6FA11C58F48657F14160F8</key>
 		<dict>
 			<key>primary</key>
 			<true/>
