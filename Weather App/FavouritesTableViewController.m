@@ -37,8 +37,23 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    CGRect frame = self.footers.frame;
+    frame.origin.y = self.tableView.frame.size.height -self.footers.frame.size.height;
+    self.footers.frame = frame;
+    [self.navigationController.view addSubview:self.footers];
+    
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     metric = [defaults boolForKey:@"metric"];
+    if (metric)
+    {
+        self.SetCelcius.alpha = 1.0;
+        self.setFarenheit.alpha = 0.5;
+    }
+    else
+    {
+        self.setFarenheit.alpha = 1.0;
+        self.SetCelcius.alpha = 0.5;
+    }
     [self getalldata];
 }
 
@@ -46,9 +61,9 @@
     [super didReceiveMemoryWarning];
 }
 
--(void)viewDidDisappear:(BOOL)animated
+-(void)viewWillDisappear:(BOOL)animated
 {
-    
+    [self.footers removeFromSuperview];
 }
 
 #pragma mark Coredata methods
@@ -85,14 +100,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if (isFiltered == YES)
-    {
-        return 1;
-    }
-    else
-    {
-        return 2;
-    }
+    return 1;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -103,28 +111,28 @@
     }
     else
     {
-        if (section == 0)
-        {
-            NSInteger count =[favLocations count];
-            return count;
-        }
-        else{
-            return 1;
-        }
+        NSInteger count =[favLocations count];
+        return count;
     }
 }
 
 #pragma mark Table View Delegate Methods
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self setSettingsView];
+}
+-(void)setSettingsView
+{
+    CGRect frame = self.footers.frame;
+    frame.origin.y = self.tableView.frame.size.height -self.footers.frame.size.height;
+    self.footers.frame = frame;
+    [self.view bringSubviewToFront:self.footers];
+}
+
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([indexPath section] == 0) {
-        return 80;
-    }
-    else
-    {
-        return 70;
-    }
+    
+    return 80;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -204,13 +212,9 @@
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if (section == 0) {
-        return @"Favourite Locations";
-    }
-    else
-    {
-        return @"Settings";
-    }
+    
+    return @"Favourite Locations";
+    
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
@@ -308,17 +312,25 @@
     });
 }
 - (IBAction)setToCelcius:(UIButton *)sender {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     [defaults setBool:YES forKey:@"metric"];
-    self.setFarenheit.alpha = 0.5f;
-    self.setCel.alpha = 1.0f;
+    self.setFarenheit.alpha = 0.5;
+    self.SetCelcius.alpha = 1.0;
+    self.SetCelcius.font = [UIFont boldSystemFontOfSize:20];
+    self.setFarenheit.font = [UIFont systemFontOfSize:18];
+    metric = YES;
+    [self.tableView reloadData];
 }
 
 - (IBAction)setToFarenheit:(UIButton *)sender {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     [defaults setBool:NO forKey:@"metric"];
-    self.setFarenheit.alpha = 1.0f;
-    self.setCel.alpha = 0.5f;
+    self.setFarenheit.alpha = 1.0;
+    self.SetCelcius.alpha = 0.5;
+    self.setFarenheit.font = [UIFont boldSystemFontOfSize:20];
+    self.SetCelcius.font = [UIFont systemFontOfSize:18];
+    metric = NO;
+    [self.tableView reloadData];
 }
 @end
 
