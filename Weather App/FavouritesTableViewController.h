@@ -19,6 +19,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *setFarenheit;
 @property (weak, nonatomic) IBOutlet UIView *footers;
 
+@property (weak, nonatomic) IBOutlet UISegmentedControl *selector;
+- (IBAction)selectUnit:(id)sender;
 
 
 @end

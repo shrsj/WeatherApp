@@ -44,6 +44,7 @@
     self.place.text = [NSString stringWithFormat:@"%@",self.Area];
     locationName = [NSString stringWithFormat:@"%@",self.Area];
     self.icon.image = [UIImage imageNamed:self.weatherType];
+    [self backgroundImage:self.weatherType];
     self.weatherLabel.text = self.weatherType;
     if (metric)
     {
@@ -390,4 +391,34 @@
     NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:dt1 toDate:dt2 options:0];
     return [components day]+1;
 }
+
+-(void) backgroundImage:(NSString *)weatherStatus
+{
+    weatherStatus = [weatherStatus lowercaseString];
+    if([weatherStatus containsString:@"cloudy"] || [weatherStatus containsString:@"mostly cloudy"] || [weatherStatus containsString:@"partly"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgCloudy"]];
+    }
+    else if([weatherStatus containsString:@"clear"] || [weatherStatus containsString:@"sunny"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgClear"]];
+    }
+    else if([weatherStatus containsString:@"rain"] || [weatherStatus containsString:@"sleet"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgrainy"]];
+    }
+    else if([weatherStatus containsString:@"snow"] || [weatherStatus containsString:@"flurries"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgSnow"]];
+    }
+    else if ([weatherStatus containsString:@"hazy"] ||[weatherStatus containsString:@"fog"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgHazy"]];
+    }
+    else if ([weatherStatus containsString:@"storms"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bglightning"]];
+    }
+}
+
 @end

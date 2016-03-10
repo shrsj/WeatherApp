@@ -2,16 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "winter-sun.jpg",
+      "filename" : "launchscreen weatherapp copy.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "winter-sun-1.jpg",
+      "filename" : "launchscreen weatherapp copy-1.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "launchscreen weatherapp copy-2.png",
       "scale" : "3x"
     }
   ],

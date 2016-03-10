@@ -90,6 +90,8 @@
     fontColor = [UIColor whiteColor];
     self.screenHeight = [UIScreen mainScreen].bounds.size.height;
     
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgClear"]];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -375,7 +377,7 @@
     
     self.weatherIcon.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",weatherType]];
     self.summary.text = sumary;
-    
+    [self backgroundImage:weatherType];
     [self saveAppDetails];
     
 }
@@ -656,6 +658,34 @@
     }
 }
 
+-(void) backgroundImage:(NSString *)weatherStatus
+{
+    weatherStatus = [weatherStatus lowercaseString];
+    if([weatherStatus containsString:@"cloudy"] || [weatherStatus containsString:@"mostly cloudy"] || [weatherStatus containsString:@"partly"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgCloudy"]];
+    }
+    else if([weatherStatus containsString:@"clear"] || [weatherStatus containsString:@"sunny"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgClear"]];
+    }
+    else if([weatherStatus containsString:@"rain"] || [weatherStatus containsString:@"sleet"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgrainy"]];
+    }
+    else if([weatherStatus containsString:@"snow"] || [weatherStatus containsString:@"flurries"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgSnow"]];
+    }
+    else if ([weatherStatus containsString:@"hazy"] ||[weatherStatus containsString:@"fog"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgHazy"]];
+    }
+    else if ([weatherStatus containsString:@"storms"])
+    {
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bglightning"]];
+    }
+}
 @end
 
 

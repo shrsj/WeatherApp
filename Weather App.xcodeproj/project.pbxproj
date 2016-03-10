@@ -19,7 +19,6 @@
 		C451299B1C5F68C700094822 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C451299A1C5F68C700094822 /* CoreLocation.framework */; };
 		C451299D1C5F68DA00094822 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C451299C1C5F68DA00094822 /* Social.framework */; };
 		C451299F1C5F68EC00094822 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C451299E1C5F68EC00094822 /* NotificationCenter.framework */; };
-		C46604081C8EC06F00A3627C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C45129731C5F688C00094822 /* Assets.xcassets */; };
 		C46604101C8EDEDF00A3627C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C466040F1C8EDEDF00A3627C /* Reachability.m */; };
 		C4DCBB131C608D2F00CAFE5A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4DCBB121C608D2F00CAFE5A /* CoreGraphics.framework */; };
 		C4DCBB151C608D4400CAFE5A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4DCBB141C608D4400CAFE5A /* Foundation.framework */; };
@@ -431,7 +430,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C46604081C8EC06F00A3627C /* Assets.xcassets in Resources */,
 				C4E0305F1C8EBDA8008B4BDE /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,0 +1,137 @@
+{
+  "images" : [
+    {
+      "idiom" : "universal",
+      "filename" : "clear sky.jpeg",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "filename" : "clear sky-1.jpeg",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "filename" : "clear sky-2.jpeg",
+      "scale" : "3x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "1x",
+      "height-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x",
+      "height-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x",
+      "height-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "1x",
+      "width-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x",
+      "width-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x",
+      "width-class" : "regular"
+    },
+    {
+      "idiom" : "universal",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "3x"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i4 potrait-1.jpeg",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i6 potrait-1.jpeg",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "3x"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i4 potrait.jpeg",
+      "height-class" : "regular",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i6 potrait.jpeg",
+      "height-class" : "regular",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "height-class" : "regular"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i6 landscape-1.jpeg",
+      "width-class" : "regular",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "iphone",
+      "filename" : "clear sky i6 landscape.jpeg",
+      "width-class" : "regular",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "width-class" : "regular"
+    },
+    {
+      "idiom" : "iphone",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "iphone",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "iphone",
+      "width-class" : "regular",
+      "height-class" : "regular",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  }
+}

@@ -332,5 +332,30 @@
     metric = NO;
     [self.tableView reloadData];
 }
+- (IBAction)selectUnit:(id)sender {
+    if (self.selector.selectedSegmentIndex == 0)
+    {
+        NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
+        [defaults setBool:YES forKey:@"metric"];
+        metric = YES;
+        [self.tableView reloadData];
+        [[[sender subviews] objectAtIndex:0] setBackgroundColor:[UIColor clearColor]];
+        [[[sender subviews] objectAtIndex:0] setTintColor:[UIColor whiteColor]];
+        [[[sender subviews] objectAtIndex:1] setBackgroundColor:[UIColor whiteColor]];
+        [[[sender subviews] objectAtIndex:1] setTintColor:[UIColor whiteColor]];
+    }
+    else if (self.selector.selectedSegmentIndex == 1)
+    {
+        NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
+        [defaults setBool:NO forKey:@"metric"];
+        metric = NO;
+        [self.tableView reloadData];
+        [[[sender subviews] objectAtIndex:1] setBackgroundColor:[UIColor clearColor]];
+        [[[sender subviews] objectAtIndex:1] setTintColor:[UIColor whiteColor]];
+        [[[sender subviews] objectAtIndex:0] setBackgroundColor:[UIColor whiteColor]];
+        [[[sender subviews] objectAtIndex:0] setTintColor:[UIColor whiteColor]];
+        
+    }
+}
 @end
 
