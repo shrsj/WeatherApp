@@ -12,11 +12,6 @@
 @interface FavouritesTableViewController : UITableViewController <UISearchControllerDelegate,UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UISearchController *search;
-
-- (IBAction)setToCelcius:(UIButton *)sender;
-- (IBAction)setToFarenheit:(UIButton *)sender;
-@property (weak, nonatomic) IBOutlet UIButton *setCel;
-@property (weak, nonatomic) IBOutlet UIButton *setFarenheit;
 @property (weak, nonatomic) IBOutlet UIView *footers;
 
 @property (weak, nonatomic) IBOutlet UISegmentedControl *selector;
