@@ -15,7 +15,7 @@
     NSMutableDictionary *searchDetails;
     NSDictionary *searches;
     NSString *cityName;
-    NSArray *searchList;
+    NSMutableArray *searchList;
     NSMutableArray *favLocations;
     
     NSMutableArray *conditions;
@@ -33,26 +33,26 @@
     [super viewDidLoad];
     self.search.searchBar.delegate = self;
     favLocations = [[NSMutableArray alloc] init];
-    
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    
-    CGRect frame = self.footers.frame;
-    frame.origin.y = self.tableView.frame.size.height -self.footers.frame.size.height;
+    searchList = [[NSMutableArray alloc]init];
+    CGRect frame = CGRectMake(0, 504, self.view.bounds.size.width, 94);
+    frame.origin.y = [UIScreen mainScreen].bounds.size.height -self.footers.frame.size.height;
     self.footers.frame = frame;
     [self.navigationController.view addSubview:self.footers];
+    /* UILayoutGuide *margin = self.view.layoutMarginsGuide;
+     [self.footers.bottomAnchor constraintEqualToAnchor:margin.bottomAnchor].active  = YES;
+     
+     [NSLayoutConstraint constraintWithItem:self.footers attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottomMargin multiplier:1.0 constant:0];
+     self.footers.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;*/
     
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     metric = [defaults boolForKey:@"metric"];
     if (metric)
     {
-        self.setCel.alpha = 1.0;
-        self.setFarenheit.alpha = 0.5;
+        self.selector.selectedSegmentIndex = 0;
     }
     else
     {
-        self.setFarenheit.alpha = 1.0;
-        self.setCel.alpha = 0.5;
+        self.selector.selectedSegmentIndex = 1;
     }
     [self getalldata];
 }
@@ -161,54 +161,50 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([indexPath section] == 0)
+    static NSString *CellIdentifier = @"Cell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+    if (isFiltered == YES)
     {
-        static NSString *CellIdentifier = @"Cell";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        if (isFiltered == YES)
-        {
-            cell.textLabel.text = [searchList[indexPath.row] valueForKey:@"name"];
-        }
-        else
-        {
-            if (!(favLocations == 0))
-            {
-                NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-                UILabel *name = (UILabel *)[cell viewWithTag:1];
-                name.text = [device valueForKey:@"placeName"];
-                UILabel *ll = (UILabel *)[cell viewWithTag:2];
-                [self getPresentConditions:[device valueForKey:@"placeName"]];
-                if ([conditions count] != 0 )
-                {
-                    NSManagedObject *detail = [conditions objectAtIndex:0];
-                    if (metric)
-                    {
-                        ll.text = [NSString stringWithFormat:@"%@ , %@℃",[detail valueForKey:@"weather"],[detail valueForKey:@"tempc"]];
-                    }
-                    else
-                    {
-                        ll.text = [NSString stringWithFormat:@"%@ , %@℉",[detail valueForKey:@"weather"],[detail valueForKey:@"tempf"]];
-                    }
-                }
-                else
-                {
-                    ll.text = @" ";
-                }
-            }
-        }
-        return cell;
+        cell.textLabel.text = [searchList[indexPath.row] valueForKey:@"name"];
+        cell.backgroundView = NULL;
     }
     else
     {
-        static NSString *CellIdentifier = @"settingsCell";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        
-        return cell;
+        if (!(favLocations == 0))
+        {
+            NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
+            UILabel *name = (UILabel *)[cell viewWithTag:1];
+            name.text = [device valueForKey:@"placeName"];
+            UILabel *ll = (UILabel *)[cell viewWithTag:2];
+            [self getPresentConditions:[device valueForKey:@"placeName"]];
+            UIImageView *av = [[UIImageView alloc] init];
+            av.backgroundColor = [UIColor clearColor];
+            av.opaque = NO;
+            if ([conditions count] != 0 )
+            {
+                NSManagedObject *detail = [conditions objectAtIndex:0];
+                NSString *imgname = [self backgroundImage:[detail valueForKey:@"weather"]];
+                av.image= [UIImage imageNamed:imgname];
+                
+                cell.backgroundView = av;
+                if (metric)
+                {
+                    ll.text = [NSString stringWithFormat:@"%@ , %@℃",[detail valueForKey:@"weather"],[detail valueForKey:@"tempc"]];
+                }
+                else
+                {
+                    ll.text = [NSString stringWithFormat:@"%@ , %@℉",[detail valueForKey:@"weather"],[detail valueForKey:@"tempf"]];
+                }
+            }
+            else
+            {
+                ll.text = @" ";
+            }
+        }
     }
+    return cell;
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
@@ -260,7 +256,7 @@
     {
         if ([indexPath section] == 0) {
             NSManagedObject *device = [favLocations objectAtIndex:indexPath.row];
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
             [defaults setObject:[device valueForKey:@"placeName"] forKey:@"favSet"];
             [[self navigationController] popToRootViewControllerAnimated:YES];
         }
@@ -272,6 +268,7 @@
 - (void)searchBar:(UISearchBar *)searchBar
     textDidChange:(NSString *)searchText
 {
+    [favLocations removeAllObjects];
     if (searchText.length == 0)
     {
         //Set boolean flag
@@ -284,17 +281,23 @@
         cityName = @"name";
         NSString* encodedUrl = [searchText stringByAddingPercentEscapesUsingEncoding:
                                 NSUTF8StringEncoding];
-        NSURLSession *session = [NSURLSession sharedSession];
-        NSURLSessionDataTask *dataTask = [session dataTaskWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://autocomplete.wunderground.com/aq?query=%@",encodedUrl]] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
-            
-            searches = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            searchList = [searches objectForKey:@"RESULTS"];
-            NSLog(@"reloading list");
-            dispatch_async(dispatch_get_main_queue(),^{
-                [self.tableView reloadData];
-            });
-        }];
-        [dataTask resume];
+        
+        [self locationSearchCall:encodedUrl];
+        /* NSURLSession *session = [NSURLSession sharedSession];
+         
+         NSURLSessionDataTask *dataTask = [session dataTaskWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://autocomplete.wunderground.com/aq?query=%@",encodedUrl]] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+         {
+         if (data.length > 0 && error == nil) {
+         searches = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+         searchList = [searches objectForKey:@"RESULTS"];
+         NSLog(@"reloading list");
+         dispatch_async(dispatch_get_main_queue(),^{
+         [self.tableView reloadData];
+         });
+         }
+         }];
+         [dataTask resume];
+         */
     }
 }
 
@@ -305,33 +308,15 @@
 
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
-    searchList = nil;
+    //searchList = nil;
+    [searchList removeAllObjects];
+    NSLog(@"%@",searchList);
     isFiltered = NO;
-    dispatch_async(dispatch_get_main_queue(),^{
-        [self.tableView reloadData];
-    });
-}
-- (IBAction)setToCelcius:(UIButton *)sender {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
-    [defaults setBool:YES forKey:@"metric"];
-    self.setFarenheit.alpha = 0.5;
-    self.setCel.alpha = 1.0;
-    self.setCel.font = [UIFont boldSystemFontOfSize:20];
-    self.setFarenheit.font = [UIFont systemFontOfSize:18];
-    metric = YES;
+    [searchBar resignFirstResponder];
+    [self getalldata];
     [self.tableView reloadData];
 }
 
-- (IBAction)setToFarenheit:(UIButton *)sender {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
-    [defaults setBool:NO forKey:@"metric"];
-    self.setFarenheit.alpha = 1.0;
-    self.setCel.alpha = 0.5;
-    self.setFarenheit.font = [UIFont boldSystemFontOfSize:20];
-    self.setCel.font = [UIFont systemFontOfSize:18];
-    metric = NO;
-    [self.tableView reloadData];
-}
 - (IBAction)selectUnit:(id)sender {
     if (self.selector.selectedSegmentIndex == 0)
     {
@@ -340,9 +325,7 @@
         metric = YES;
         [self.tableView reloadData];
         [[[sender subviews] objectAtIndex:0] setBackgroundColor:[UIColor clearColor]];
-        [[[sender subviews] objectAtIndex:0] setTintColor:[UIColor whiteColor]];
         [[[sender subviews] objectAtIndex:1] setBackgroundColor:[UIColor whiteColor]];
-        [[[sender subviews] objectAtIndex:1] setTintColor:[UIColor whiteColor]];
     }
     else if (self.selector.selectedSegmentIndex == 1)
     {
@@ -351,11 +334,65 @@
         metric = NO;
         [self.tableView reloadData];
         [[[sender subviews] objectAtIndex:1] setBackgroundColor:[UIColor clearColor]];
-        [[[sender subviews] objectAtIndex:1] setTintColor:[UIColor whiteColor]];
-        [[[sender subviews] objectAtIndex:0] setBackgroundColor:[UIColor whiteColor]];
-        [[[sender subviews] objectAtIndex:0] setTintColor:[UIColor whiteColor]];
-        
+        [[[sender subviews] objectAtIndex:0] setBackgroundColor:[UIColor whiteColor]];        
     }
+}
+
+-(NSString *) backgroundImage:(NSString *)weatherStatus
+{
+    weatherStatus = [weatherStatus lowercaseString];
+    NSString * string = [[NSString alloc] init];
+    if([weatherStatus containsString:@"cloudy"] || [weatherStatus containsString:@"mostly cloudy"] || [weatherStatus containsString:@"partly"])
+    {
+        string = @"bgCloudy";
+    }
+    else if([weatherStatus containsString:@"clear"] || [weatherStatus containsString:@"sunny"])
+    {
+        string = @"bgClear";
+    }
+    else if([weatherStatus containsString:@"rain"] || [weatherStatus containsString:@"sleet"])
+    {
+        string = @"bgrainy";
+    }
+    else if([weatherStatus containsString:@"snow"] || [weatherStatus containsString:@"flurries"])
+    {
+        string = @"bgSnow";
+    }
+    else if ([weatherStatus containsString:@"hazy"] ||[weatherStatus containsString:@"fog"])
+    {
+        string = @"bgHazy";
+    }
+    else if ([weatherStatus containsString:@"storms"])
+    {
+        string = @"bglightning";
+    }
+    return string;
+}
+
+-(void) locationSearchCall: (NSString *)searchText
+{
+    NSString *urlString = [NSString stringWithFormat:@"https://autocomplete.wunderground.com/aq?query=%@",searchText];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:[NSOperationQueue mainQueue ]
+                           completionHandler:^(NSURLResponse *response,
+                                               NSData *data, NSError *connectionError)
+     {
+         if(data.length > 0 && connectionError == nil)
+         {
+             searches = [[NSMutableDictionary alloc] init];
+             //   searchList = [[NSArray alloc] init];
+             
+             searches = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+             searchList =[[searches objectForKey:@"RESULTS"] mutableCopy];
+             
+             if([searchList count] > 0)
+             {
+                 [self.tableView reloadData];
+             }
+         }
+     }];
 }
 @end
 

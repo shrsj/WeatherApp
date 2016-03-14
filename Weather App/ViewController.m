@@ -69,7 +69,7 @@
     NSString *visited;
     NSDate *lastVisited;
     
-    BOOL Metric;
+    BOOL metric;
     BOOL infoUpdated;
     
     UIColor *fontColor;
@@ -118,7 +118,7 @@
         NSLog(@"%@ %@",place,check);
     }
     
-    Metric = [defaults boolForKey:@"metric"];
+    metric = [defaults boolForKey:@"metric"];
     infoUpdated = NO;
     NSString *dated = [defaults objectForKey:@"lastVisited"];
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
@@ -142,7 +142,7 @@
             [self getData];
             if ([presentConditions count] != 0) {
                 
-                [self UpdateFromDB];
+                [self updateFromDb];
                 [self updateInfo];
             }
             else
@@ -165,7 +165,7 @@
             [self getData];
             
             if ([presentConditions count] != 0) {
-                [self UpdateFromDB];
+                [self updateFromDb];
                 [self updateInfo];
             }
             else
@@ -316,7 +316,7 @@
         NSString *temp_c = [temp valueForKey:@"metric"];
         NSString *temp_f = [temp valueForKey:@"english"];
         
-        if (Metric)
+        if (metric)
         {
             NSString *tempt = temp_c;
             labelMaxMin.text = [NSString stringWithFormat:@" %@ ℃",tempt];
@@ -342,7 +342,7 @@
 {
     [self.activIndicator stopAnimating];
     [self.activIndicator removeFromSuperview];
-    self.Place.text = full;
+    self.place.text = full;
     if (self.setLocation) {
         self.locationName = self.locationName;
     }
@@ -351,16 +351,16 @@
         self.locationName = full;
         
     }
-    if (Metric)
+    if (metric)
     {
         NSString *tempc = currentTemp_c;
         if (tempc.length > 1) {
             tempc = [tempc substringToIndex:2];
         }
         
-        self.Temperature.text = [NSString stringWithFormat:@"%@",tempc];
+        self.temperature.text = [NSString stringWithFormat:@"%@",tempc];
         self.tempUnit.text = @"℃";
-        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℃\nHeat Index : %@℃\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
+        self.info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℃\nHeat Index : %@℃\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_c,heatIndex_c,windString,precipitation_string,visibilityString];
     }
     else
     {
@@ -368,12 +368,12 @@
         if (tempf.length > 1) {
             tempf = [tempf substringToIndex:2];
         }
-        self.Temperature.text = [NSString stringWithFormat:@"%@",tempf];
+        self.temperature.text = [NSString stringWithFormat:@"%@",tempf];
         self.tempUnit.text = @"℉";
-        self.Info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℉\nHeat Index : %@℉\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
+        self.info.text = [NSString stringWithFormat:@"Humidity : %@\nFeels Like : %@℉\nHeat Index : %@℉\nWind Conditions : %@\nPrecipitation : %@\nVisibility : %@\n",humidity,feels_f,heatIndex_f,windString,precipitation_string,visibilityString];
     }
     self.weatherText.text = weatherType;
-    self.Info.textColor = [UIColor whiteColor];
+    self.info.textColor = [UIColor whiteColor];
     
     self.weatherIcon.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@",weatherType]];
     self.summary.text = sumary;
@@ -382,7 +382,7 @@
     
 }
 //When network doesnt exist update from db
--(void)UpdateFromDB
+-(void)updateFromDb
 {
     NSManagedObject *show = [presentConditions objectAtIndex:0];
     full = [show valueForKey:@"place"];

@@ -16,10 +16,10 @@
 
 
 @property (weak, nonatomic) IBOutlet UIImageView *weatherIcon;
-@property (weak, nonatomic) IBOutlet UILabel *Place;
-@property (weak, nonatomic) IBOutlet UILabel *Temperature;
+@property (weak, nonatomic) IBOutlet UILabel *place;
+@property (weak, nonatomic) IBOutlet UILabel *temperature;
 @property (weak, nonatomic) IBOutlet UILabel *weatherText;
-@property (weak, nonatomic) IBOutlet UITextView *Info;
+@property (weak, nonatomic) IBOutlet UITextView *info;
 @property (weak, nonatomic) IBOutlet UILabel *summary;
 @property (weak, nonatomic) IBOutlet UILabel *tempUnit;
 

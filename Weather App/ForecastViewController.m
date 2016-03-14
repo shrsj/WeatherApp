@@ -12,7 +12,7 @@
 
 @interface ForecastViewController ()
 {
-    NSDictionary *Forecast;
+    NSDictionary *forecast;
     NSDictionary *jsonf;
     NSArray *simpleForecast;
     NSArray *details;
@@ -41,8 +41,8 @@
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     metric = [defaults boolForKey:@"metric"];
     
-    self.place.text = [NSString stringWithFormat:@"%@",self.Area];
-    locationName = [NSString stringWithFormat:@"%@",self.Area];
+    self.place.text = [NSString stringWithFormat:@"%@",self.area];
+    locationName = [NSString stringWithFormat:@"%@",self.area];
     self.icon.image = [UIImage imageNamed:self.weatherType];
     [self backgroundImage:self.weatherType];
     self.weatherLabel.text = self.weatherType;
@@ -97,8 +97,8 @@
         if (data)
         {
             jsonf = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            Forecast = [jsonf objectForKey:@"forecast"];
-            NSDictionary *temp = [Forecast objectForKey:@"simpleforecast"];
+            forecast = [jsonf objectForKey:@"forecast"];
+            NSDictionary *temp = [forecast objectForKey:@"simpleforecast"];
             simpleForecast = [temp objectForKey:@"forecastday"];
             details = [simpleForecast valueForKey:@"date"];
             count = [simpleForecast count];
@@ -123,7 +123,7 @@
                 [self.activityIndicator stopAnimating];
                 [self.activityIndicator removeFromSuperview];
             });
-            if (Forecast == NULL)
+            if (forecast == NULL)
             {
                 NSDictionary *response = [jsonf objectForKey:@"response"];
                 NSDictionary *error = [response objectForKey:@"error"];

@@ -20,7 +20,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *table;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
-@property NSString *Area;
+@property NSString *area;
 @property NSString *latitude;
 @property NSString *longitude;
 @property NSString *tempf;
