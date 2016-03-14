@@ -100,7 +100,7 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     NSString *check = [defaults objectForKey:@"favSet"];
     
     if ([check isEqualToString:@"clear"]) {
@@ -559,7 +559,7 @@
     NSString *msg = @"Oops....";
     NSString *fullMessage = [NSString stringWithFormat:@"%@\n %@",msg,errorMsg];
     UIAlertController * alert=   [UIAlertController
-                                  alertControllerWithTitle:@"RSS Feeds"
+                                  alertControllerWithTitle:@"Weather App"
                                   message:fullMessage
                                   preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* ok = [UIAlertAction
@@ -591,7 +591,6 @@
         SLComposeViewController *vc = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
         NSString *status = [NSString stringWithFormat:@"Hi, Here's what You got for todays weather %@",sumary];
         [vc setInitialText:status];
-        [vc addImage:[UIImage imageNamed:weatherType]];
         [self presentViewController:vc animated:YES completion:nil];
     }
     else
@@ -621,7 +620,7 @@
 -(void)saveAppDetails
 {
     // Store the data
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"dd MM yyyy ZZZZ"];
     visited = [format stringFromDate:[NSDate date]];
