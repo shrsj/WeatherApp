@@ -38,7 +38,7 @@
     [super viewDidLoad];
     self.table.delegate = self;
     self.table.dataSource = self;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
     metric = [defaults boolForKey:@"metric"];
     
     self.place.text = [NSString stringWithFormat:@"%@",self.Area];
@@ -282,6 +282,7 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
+    [cell setBackgroundColor:[UIColor clearColor]];
     UILabel *Day = (UILabel *)[cell viewWithTag:101];
     UILabel *Conditions = (UILabel *)[cell viewWithTag:102];
     UIImageView *icon = (UIImageView *)[cell viewWithTag:103];
@@ -369,7 +370,7 @@
     NSString *msg = @"Oops....";
     NSString *fullMessage = [NSString stringWithFormat:@"%@\n %@",msg,errorMsg];
     UIAlertController * alert=   [UIAlertController
-                                  alertControllerWithTitle:@"RSS Feeds"
+                                  alertControllerWithTitle:@"Weather App"
                                   message:fullMessage
                                   preferredStyle:UIAlertControllerStyleAlert];
     
