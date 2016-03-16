@@ -25,6 +25,7 @@
 		C4DCBB171C608D5700CAFE5A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4DCBB161C608D5700CAFE5A /* UIKit.framework */; };
 		C4DCBB191C608D8300CAFE5A /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4DCBB181C608D8300CAFE5A /* MobileCoreServices.framework */; };
 		C4DCEC051C6B664F00FEA3FC /* ForecastViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4DCEC041C6B664F00FEA3FC /* ForecastViewController.m */; };
+		C4DD9D541C97CAD50005691C /* FavouriteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4DD9D531C97CAD50005691C /* FavouriteViewController.m */; };
 		C4E030581C8EBDA8008B4BDE /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4E030571C8EBDA8008B4BDE /* NotificationCenter.framework */; };
 		C4E0305C1C8EBDA8008B4BDE /* TodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E0305B1C8EBDA8008B4BDE /* TodayViewController.m */; };
 		C4E0305F1C8EBDA8008B4BDE /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4E0305D1C8EBDA8008B4BDE /* MainInterface.storyboard */; };
@@ -100,6 +101,8 @@
 		C4DCBB181C608D8300CAFE5A /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		C4DCEC031C6B664F00FEA3FC /* ForecastViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ForecastViewController.h; sourceTree = "<group>"; };
 		C4DCEC041C6B664F00FEA3FC /* ForecastViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ForecastViewController.m; sourceTree = "<group>"; };
+		C4DD9D521C97CAD50005691C /* FavouriteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavouriteViewController.h; sourceTree = "<group>"; };
+		C4DD9D531C97CAD50005691C /* FavouriteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavouriteViewController.m; sourceTree = "<group>"; };
 		C4E030561C8EBDA8008B4BDE /* WeatherWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WeatherWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E030571C8EBDA8008B4BDE /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		C4E0305A1C8EBDA8008B4BDE /* TodayViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TodayViewController.h; sourceTree = "<group>"; };
@@ -195,6 +198,8 @@
 				C4DCEC041C6B664F00FEA3FC /* ForecastViewController.m */,
 				C4E608E81C64A1B7000648E5 /* FavouritesTableViewController.h */,
 				C4E608E91C64A1B7000648E5 /* FavouritesTableViewController.m */,
+				C4DD9D521C97CAD50005691C /* FavouriteViewController.h */,
+				C4DD9D531C97CAD50005691C /* FavouriteViewController.m */,
 				C451296D1C5F688C00094822 /* Main.storyboard */,
 				C45129731C5F688C00094822 /* Assets.xcassets */,
 				C45129751C5F688C00094822 /* LaunchScreen.storyboard */,
@@ -441,6 +446,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4DD9D541C97CAD50005691C /* FavouriteViewController.m in Sources */,
 				C45129721C5F688C00094822 /* Weather_App.xcdatamodeld in Sources */,
 				C4DCEC051C6B664F00FEA3FC /* ForecastViewController.m in Sources */,
 				C451296C1C5F688C00094822 /* ViewController.m in Sources */,

@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "ForecastViewController.h"
 #import <Social/Social.h>
+#import "FavouriteViewController.h"
 
 #define API_KEY @"b706ffe1f894f6be"
 #define API_KEY2 @"cdad743a382da6d1"
@@ -572,12 +573,6 @@
                          }];
     [alert addAction:ok];
     [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (IBAction)favbutton:(id)sender
-{
-    FavouritesTableViewController *faVC = [self.storyboard instantiateViewControllerWithIdentifier:@"fvController"];
-    [self.navigationController pushViewController:faVC animated:YES];
 }
 
 - (IBAction)forecast:(UIButton *)sender
