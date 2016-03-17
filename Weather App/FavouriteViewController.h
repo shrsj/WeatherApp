@@ -13,10 +13,12 @@
 @property (weak, nonatomic) IBOutlet UITableView *table;
 @property (weak, nonatomic) IBOutlet UIView *setting;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *unit;
+@property (strong, nonatomic) IBOutlet UISearchController *search;
+@property FavouriteViewController *searchResultsController;
 
 - (IBAction)setUnit:(UISegmentedControl *)sender;
 
-@property (strong, nonatomic) IBOutlet UISearchController *search;
-
+@property BOOL searchIsActive;
+@property BOOL searchIsFirstResponder;
 
 @end

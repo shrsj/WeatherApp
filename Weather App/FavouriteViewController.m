@@ -17,9 +17,6 @@
     NSMutableArray *favList;
     NSMutableArray *searchList;
     NSMutableArray *conditions;
-    
-    
-    
 }
 @end
 
@@ -43,9 +40,23 @@
     self.table.dataSource = self;
     self.table.delegate = self;
     
-    
     [self initSearch];
+    [self getalldata];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     
+    // restore the searchController's active state
+    if (self.searchIsActive) {
+        self.search.active = self.searchIsActive;
+        _searchIsActive = NO;
+        
+        if (self.searchIsFirstResponder) {
+            [self.search.searchBar becomeFirstResponder];
+            _searchIsFirstResponder = NO;
+        }
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -53,22 +64,17 @@
     // Dispose of any resources that can be recreated.
 }
 
+
 #pragma mark UI Search methods
 
 -(void) initSearch
 {
-    FavouriteViewController *searchResultsController =  [[FavouriteViewController alloc] init];
-    searchResultsController.table.dataSource = self;
-    searchResultsController.table.delegate = self;
-    searchResultsController.table.allowsSelectionDuringEditing = YES;
-    searchResultsController.table.allowsSelection = YES;
-    self.search = [[UISearchController alloc] initWithSearchResultsController:searchResultsController];
+    self.search = [[UISearchController alloc] initWithSearchResultsController:nil];
     self.definesPresentationContext = NO;
     self.table.tableHeaderView = self.search.searchBar;
     self.search.searchResultsUpdater = self;
     self.search.searchBar.delegate = self;
     self.search.dimsBackgroundDuringPresentation = NO;
-    
 }
 
 -(void)updateSearchResultsForSearchController:(UISearchController *)searchController
@@ -77,19 +83,21 @@
     
     if ([searchString length] == 0) {
         
-        filtered = NO;
+        _searchIsFirstResponder = YES;
         return;
     }
     else if(searchString.length > 0)
     {
-        filtered = YES;
+        _searchIsActive = YES;
         [self locationSearchCall:searchString];
     }
 }
 
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
-    filtered = NO;
+    _searchIsActive = NO;
+    _searchIsFirstResponder = NO;
+    self.search.active = NO;
     [searchList removeAllObjects];
     [self getalldata];
     [self.table reloadData];
@@ -162,6 +170,7 @@
     {
         cell.textLabel.text = [searchList[indexPath.row] valueForKey:@"name"];
         cell.backgroundView = NULL;
+        cell.detailTextLabel.text = @"";
     }
     else
     {
@@ -267,6 +276,34 @@
 #pragma mark methods
 
 - (IBAction)setUnit:(UISegmentedControl *)sender {
+    
+    NSInteger num = sender.selectedSegmentIndex;
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.SJI.Weather-App"];
+    if (num == 0)
+    {
+        
+        [defaults setBool:YES forKey:@"metric"];
+        metric = YES;
+        [self.table reloadData];
+    }
+    else if (num == 1)
+    {
+        [defaults setBool:NO forKey:@"metric"];
+        metric = NO;
+        [self.table reloadData];
+    }
+    else
+    {
+        metric = [defaults boolForKey:@"metric"];
+        if (metric)
+        {
+            self.unit.selectedSegmentIndex = 0;
+        }
+        else
+        {
+            self.unit.selectedSegmentIndex = 1;
+        }
+    }
 }
 
 -(NSString *) backgroundImage:(NSString *)weatherStatus

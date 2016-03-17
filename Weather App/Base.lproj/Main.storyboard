@@ -34,20 +34,18 @@
                                         <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <segmentedControl contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="plain" selectedSegmentIndex="0" momentary="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Mtn-3e-inF">
-                                        <rect key="frame" x="490" y="30" width="90" height="31"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="cXH-2D-nHB">
+                                        <rect key="frame" x="480" y="26" width="100" height="29"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="90" id="AwT-pb-1rY"/>
-                                            <constraint firstAttribute="height" constant="30" id="swB-iu-e6O"/>
+                                            <constraint firstAttribute="width" constant="100" id="qV0-rI-QKx"/>
                                         </constraints>
                                         <segments>
-                                            <segment title="℃"/>
-                                            <segment title="℉"/>
+                                            <segment title="C"/>
+                                            <segment title="F"/>
                                         </segments>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <connections>
-                                            <action selector="setUnit:" destination="Npq-X2-DyL" eventType="valueChanged" id="WiT-Ei-KHT"/>
+                                            <action selector="setUnit:" destination="Npq-X2-DyL" eventType="valueChanged" id="okA-Op-LrT"/>
                                         </connections>
                                     </segmentedControl>
                                 </subviews>
@@ -55,21 +53,15 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="80" id="61O-0x-kC6"/>
                                     <constraint firstItem="gBK-Vq-L1i" firstAttribute="top" secondItem="8XH-hN-4Mu" secondAttribute="top" id="62i-fG-4Fh"/>
-                                    <constraint firstAttribute="trailing" secondItem="Mtn-3e-inF" secondAttribute="trailing" constant="20" symbolic="YES" id="9gp-rZ-j5T"/>
-                                    <constraint firstAttribute="bottom" secondItem="Mtn-3e-inF" secondAttribute="bottom" constant="20" symbolic="YES" id="Nhu-tS-jTC"/>
+                                    <constraint firstAttribute="trailing" secondItem="cXH-2D-nHB" secondAttribute="trailing" constant="20" symbolic="YES" id="hng-1M-Avo"/>
                                     <constraint firstItem="ZkW-dA-2A4" firstAttribute="leading" secondItem="8XH-hN-4Mu" secondAttribute="leading" constant="20" symbolic="YES" id="jeE-fI-Bo2"/>
                                     <constraint firstItem="ZkW-dA-2A4" firstAttribute="centerY" secondItem="8XH-hN-4Mu" secondAttribute="centerY" id="mRf-iD-mWw"/>
                                     <constraint firstItem="gBK-Vq-L1i" firstAttribute="centerX" secondItem="8XH-hN-4Mu" secondAttribute="centerX" id="pai-G1-8De"/>
-                                    <constraint firstItem="Mtn-3e-inF" firstAttribute="centerY" secondItem="8XH-hN-4Mu" secondAttribute="centerY" id="t4k-PA-0EX"/>
+                                    <constraint firstItem="cXH-2D-nHB" firstAttribute="centerY" secondItem="8XH-hN-4Mu" secondAttribute="centerY" id="ygf-Al-6UD"/>
                                 </constraints>
-                                <variation key="default">
-                                    <mask key="constraints">
-                                        <exclude reference="t4k-PA-0EX"/>
-                                    </mask>
-                                </variation>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="HgP-7c-c5J">
-                                <rect key="frame" x="0.0" y="20" width="600" height="500"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="456"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <searchBar key="tableHeaderView" contentMode="redraw" id="xcn-RP-CqX">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
@@ -95,13 +87,13 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="HgP-7c-c5J" secondAttribute="trailing" id="5aU-Wr-Msv"/>
                             <constraint firstItem="i1T-BP-Ywh" firstAttribute="top" secondItem="8XH-hN-4Mu" secondAttribute="bottom" id="6Xg-TY-a7G"/>
-                            <constraint firstItem="HgP-7c-c5J" firstAttribute="top" secondItem="meg-Wo-Vll" secondAttribute="top" constant="20" symbolic="YES" id="7ye-DU-CLv"/>
                             <constraint firstItem="8XH-hN-4Mu" firstAttribute="leading" secondItem="meg-Wo-Vll" secondAttribute="leading" id="CPa-kb-7iQ"/>
                             <constraint firstItem="8XH-hN-4Mu" firstAttribute="leading" secondItem="meg-Wo-Vll" secondAttribute="leading" constant="20" symbolic="YES" id="MZ4-6P-9lO"/>
                             <constraint firstItem="i1T-BP-Ywh" firstAttribute="top" secondItem="8XH-hN-4Mu" secondAttribute="bottom" id="WVA-xo-pDD"/>
                             <constraint firstItem="i1T-BP-Ywh" firstAttribute="top" secondItem="8XH-hN-4Mu" secondAttribute="bottom" constant="8" symbolic="YES" id="Z84-86-xPd"/>
                             <constraint firstAttribute="trailing" secondItem="8XH-hN-4Mu" secondAttribute="trailing" id="cc2-3e-h1V"/>
                             <constraint firstItem="HgP-7c-c5J" firstAttribute="leading" secondItem="meg-Wo-Vll" secondAttribute="leading" id="cgA-SJ-Its"/>
+                            <constraint firstItem="HgP-7c-c5J" firstAttribute="top" secondItem="tUV-Hf-rPf" secondAttribute="bottom" id="qKa-ID-i10"/>
                             <constraint firstItem="8XH-hN-4Mu" firstAttribute="top" secondItem="HgP-7c-c5J" secondAttribute="bottom" id="sev-E3-4sT"/>
                         </constraints>
                         <variation key="default">
@@ -116,7 +108,7 @@
                         <outlet property="searchDisplayController" destination="4LE-ts-owe" id="JSj-b7-7qz"/>
                         <outlet property="setting" destination="meg-Wo-Vll" id="Vrx-3L-9Gw"/>
                         <outlet property="table" destination="HgP-7c-c5J" id="QEc-Sw-Zry"/>
-                        <outlet property="unit" destination="Mtn-3e-inF" id="vpH-8b-tQs"/>
+                        <outlet property="unit" destination="cXH-2D-nHB" id="dFp-OC-b9E"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="VyQ-sD-IvK" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -306,7 +298,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Favourites" id="17a-1T-na6">
                             <connections>
-                                <segue destination="Npq-X2-DyL" kind="showDetail" id="REo-Tx-uhg"/>
+                                <segue destination="Npq-X2-DyL" kind="show" identifier="showFav" id="c3y-mc-IZk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
