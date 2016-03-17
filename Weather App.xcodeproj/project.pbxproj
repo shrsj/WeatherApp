@@ -30,7 +30,6 @@
 		C4E0305C1C8EBDA8008B4BDE /* TodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E0305B1C8EBDA8008B4BDE /* TodayViewController.m */; };
 		C4E0305F1C8EBDA8008B4BDE /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4E0305D1C8EBDA8008B4BDE /* MainInterface.storyboard */; };
 		C4E030631C8EBDA8008B4BDE /* WeatherWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C4E030561C8EBDA8008B4BDE /* WeatherWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C4E608EA1C64A1B7000648E5 /* FavouritesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E608E91C64A1B7000648E5 /* FavouritesTableViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,8 +109,6 @@
 		C4E0305E1C8EBDA8008B4BDE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		C4E030601C8EBDA8008B4BDE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C4E030681C8EBDE2008B4BDE /* WeatherWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = WeatherWidget.entitlements; sourceTree = "<group>"; };
-		C4E608E81C64A1B7000648E5 /* FavouritesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavouritesTableViewController.h; sourceTree = "<group>"; };
-		C4E608E91C64A1B7000648E5 /* FavouritesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavouritesTableViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,8 +193,6 @@
 				C451296B1C5F688C00094822 /* ViewController.m */,
 				C4DCEC031C6B664F00FEA3FC /* ForecastViewController.h */,
 				C4DCEC041C6B664F00FEA3FC /* ForecastViewController.m */,
-				C4E608E81C64A1B7000648E5 /* FavouritesTableViewController.h */,
-				C4E608E91C64A1B7000648E5 /* FavouritesTableViewController.m */,
 				C4DD9D521C97CAD50005691C /* FavouriteViewController.h */,
 				C4DD9D531C97CAD50005691C /* FavouriteViewController.m */,
 				C451296D1C5F688C00094822 /* Main.storyboard */,
@@ -452,7 +447,6 @@
 				C451296C1C5F688C00094822 /* ViewController.m in Sources */,
 				C46604101C8EDEDF00A3627C /* Reachability.m in Sources */,
 				C45129691C5F688C00094822 /* AppDelegate.m in Sources */,
-				C4E608EA1C64A1B7000648E5 /* FavouritesTableViewController.m in Sources */,
 				C45129661C5F688C00094822 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
